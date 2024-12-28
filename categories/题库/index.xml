@@ -6,13 +6,12 @@
         <description>Recent content in 题库 on 米 粒</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>米饭能吃饱</copyright>
-        <lastBuildDate>Fri, 27 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/categories/%E9%A2%98%E5%BA%93/index.xml" rel="self" type="application/rss+xml" /><item>
+        <copyright>米饭能吃饱</copyright><atom:link href="https://z221224.github.io/yuan/categories/%E9%A2%98%E5%BA%93/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>JavaWEB和SSM题库</title>
-        <link>https://z221224.github.io/yuan/p/test-chinese/</link>
-        <pubDate>Fri, 27 Dec 2024 00:00:00 +0000</pubDate>
+        <link>https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://z221224.github.io/yuan/p/test-chinese/</guid>
+        <guid>https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/</guid>
         <description>&lt;h2 id=&#34;javaweb部分&#34;&gt;JavaWEB部分
 &lt;/h2&gt;&lt;h3 id=&#34;请描述转发和重定向的区别&#34;&gt;请描述转发和重定向的区别？
 &lt;/h3&gt;&lt;p&gt;1、请求次数： 转发一次，重定向两次  2、浏览器地址：转发不变，重定向改变  3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据  4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会  5、效率：转发浏览器一次请求效率高，重定向效率低  6、WEB-INF下资源：转发可以访问，重定向不可以&lt;/p&gt;
