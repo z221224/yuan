@@ -20,23 +20,30 @@
 &lt;p&gt;3.JVM 的常用参数调优你知道哪些?&lt;/p&gt;
 &lt;p&gt;4.GC是什么? 为什么需要GC?&lt;/p&gt;
 &lt;p&gt;5.什么是类加载器?&lt;/p&gt;
-&lt;h2 id=&#34;什么是jvm&#34;&gt;什么是JVM
-&lt;/h2&gt;&lt;p&gt;JVM：&lt;strong&gt;J&lt;/strong&gt;ava &lt;strong&gt;V&lt;/strong&gt;irtual &lt;strong&gt;M&lt;/strong&gt;achine，Java虚拟机&lt;/p&gt;
+&lt;h3 id=&#34;什么是jvm&#34;&gt;什么是JVM
+&lt;/h3&gt;&lt;p&gt;JVM：&lt;strong&gt;J&lt;/strong&gt;ava &lt;strong&gt;V&lt;/strong&gt;irtual &lt;strong&gt;M&lt;/strong&gt;achine，Java虚拟机&lt;/p&gt;
 &lt;p&gt;**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。&lt;/p&gt;
 &lt;p&gt;为什么要在程序和操作系统中间添加一个JVM？&lt;/p&gt;
 &lt;p&gt;Java 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以&lt;strong&gt;实现跨平台&lt;/strong&gt;了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于&lt;strong&gt;一次编译，处处运行&lt;/strong&gt;，能够做到这一点 JVM 功不可没。&lt;/p&gt;
-&lt;h2 id=&#34;主流虚拟机有哪些&#34;&gt;主流虚拟机有哪些？
-&lt;/h2&gt;&lt;ul&gt;
+&lt;h3 id=&#34;主流虚拟机有哪些&#34;&gt;主流虚拟机有哪些？
+&lt;/h3&gt;&lt;ul&gt;
 &lt;li&gt;JCP组织（Java Community Process 开放的国际组织 ）：&lt;strong&gt;Hotspot虚拟机&lt;/strong&gt;（Open JDK版），sun2006年开源&lt;/li&gt;
 &lt;li&gt;Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费&lt;/li&gt;
 &lt;li&gt;BEA：JRockit虚拟机&lt;/li&gt;
 &lt;li&gt;IBM：J9虚拟机&lt;/li&gt;
 &lt;li&gt;阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h2 id=&#34;结构图&#34;&gt;结构图
-&lt;/h2&gt;&lt;p&gt;**JVM的作用：**加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序&lt;/p&gt;
-&lt;p&gt;**JVM的特点：**一次编译到处运行、自动内存管理、自动垃圾回收&lt;/p&gt;
-&lt;img src=&#34;image-20240801163747777.png&#34;&gt;
+&lt;h3 id=&#34;结构图&#34;&gt;结构图
+&lt;/h3&gt;&lt;p&gt;JVM的作用：加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序&lt;/p&gt;
+&lt;p&gt;JVM的特点：一次编译到处运行、自动内存管理、自动垃圾回收&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240801163747777.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;类加载器子系统：将字节码文件（.class）加载到内存中的方法区&lt;/p&gt;
@@ -45,8 +52,8 @@
 &lt;p&gt;运行时数据区：&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;方法区：存储已被虚拟机加载的类的&lt;strong&gt;元数据信息(元空间)&lt;/strong&gt;。也就是存储字节码信息。&lt;/li&gt;
-&lt;li&gt;堆：&lt;strong&gt;存放对象实例&lt;/strong&gt;，几乎所有的对象实例都在这里分配内存。&lt;/li&gt;
-&lt;li&gt;虚拟机栈(java栈)：虚拟机栈描述的是&lt;strong&gt;Java方法执行的内存模型&lt;/strong&gt;。每个方法被执行的时候都会创建一个&lt;strong&gt;栈帧&lt;/strong&gt;（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息&lt;/li&gt;
+&lt;li&gt;堆：存放对象实例，几乎所有的对象实例都在这里分配内存。&lt;/li&gt;
+&lt;li&gt;虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型**。每个方法被执行的时候都会创建一个**栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息&lt;/li&gt;
 &lt;li&gt;本地方法栈：本地方法栈则是&lt;strong&gt;记录&lt;/strong&gt;虚拟机当前使用到的&lt;strong&gt;native方法&lt;/strong&gt;。&lt;/li&gt;
 &lt;li&gt;程序计数器：当前线程所执行的字节码的&lt;strong&gt;行号指示器&lt;/strong&gt;。&lt;/li&gt;
 &lt;/ul&gt;
@@ -58,6 +65,393 @@
 &lt;p&gt;执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;多线程共享方法区和堆；&lt;/li&gt;
+&lt;li&gt;Java栈、本地方法栈、程序计数器是每个线程私有的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;执行引擎execution-engine&#34;&gt;执行引擎Execution Engine
+&lt;/h3&gt;&lt;p&gt;Execution Engine执行引擎负责解释命令(将字节码指令解释编译为机器码指令)，提交操作系统执行。&lt;/p&gt;
+&lt;p&gt;JVM执行引擎通常由两个主要组成部分构成：&lt;strong&gt;解释器和即时编译器（Just-In-Time Compiler，JIT Compiler）&lt;/strong&gt;。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;解释器：当Java字节码被加载到内存中时，解释器逐条解析和执行字节码指令。解释器逐条执行字节码，将每条指令转换为对应平台上的本地机器指令。由于解释器逐条解析执行，因此执行速度相对较慢。但解释器具有优点，即可立即执行字节码，无需等待编译过程。&lt;/li&gt;
+&lt;li&gt;即时编译器（JIT Compiler）：为了提高执行速度，JVM还使用即时编译器。即时编译器将字节码动态地编译为本地机器码，以便直接在底层硬件上执行。即时编译器根据运行时的性能数据和优化技术，对经常执行的热点代码进行优化，从而提高程序的性能。即时编译器可以将经过优化的代码缓存起来，以便下次再次执行时直接使用。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;JVM执行引擎还包括其他一些重要的组件，如&lt;strong&gt;即时编译器后端、垃圾回收器、线程管理器&lt;/strong&gt;等。这些组件共同协作，使得Java程序能够在不同的操作系统和硬件平台上运行，并且具备良好的性能。&lt;/p&gt;
+&lt;h3 id=&#34;本地方法接口native-interface&#34;&gt;本地方法接口Native Interface
+&lt;/h3&gt;&lt;p&gt;本地接口的作用是融合不同的编程语言为 Java 所用，于是就在内存中专门开辟了一块区域处理标记为native的代码，它的具体做法是 Native Method Stack中登记 native方法，在Execution Engine 执行时加载native libraies。&lt;/p&gt;
+&lt;p&gt;例如&lt;strong&gt;Thread类&lt;/strong&gt;中有一些标记为native的方法：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811105702139.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;native-method-stack&#34;&gt;Native Method Stack
+&lt;/h3&gt;&lt;p&gt;本地方法栈存储了从Java代码中调用本地方法时所需的信息。是&lt;strong&gt;线程私有&lt;/strong&gt;的。&lt;/p&gt;
+&lt;h3 id=&#34;pc寄存器程序计数器&#34;&gt;PC寄存器(程序计数器)
+&lt;/h3&gt;&lt;p&gt;每个线程都有一个程序计数器，是&lt;strong&gt;线程私有&lt;/strong&gt;的，就是一个指针，指向方法区中的方法字节码（用来存储指向下一条指令的地址，即 将要执行的指令代码），由执行引擎读取下一条指令，是一个非常小的内存空间，几乎可以忽略不记。&lt;/p&gt;
+&lt;h2 id=&#34;类加载器classloader&#34;&gt;类加载器ClassLoader
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;负责加载class文件，class文件在文件开头有特定的文件标识(cafe babe)。&lt;/li&gt;
+&lt;li&gt;ClassLoader只负责class文件的加载，至于它是否可以运行，则由Execution Engine决定。&lt;/li&gt;
+&lt;li&gt;加载的类信息存放到方法区的内存空间。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;类的加载过程&#34;&gt;类的加载过程
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;类加载过程&lt;/strong&gt;主要分为三个步骤：&lt;strong&gt;加载&lt;/strong&gt;、&lt;strong&gt;链接&lt;/strong&gt;、&lt;strong&gt;初始化&lt;/strong&gt;，而其中链接过程又分为三个步骤：&lt;strong&gt;验证&lt;/strong&gt;、&lt;strong&gt;准备&lt;/strong&gt;、&lt;strong&gt;解析&lt;/strong&gt;，加上&lt;strong&gt;使用、卸载&lt;/strong&gt;两个步骤统称为为类的生命周期。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20221110122305222.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;阶段一：加载&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过一个类的全限定名获取定义此类的二进制字节流&lt;/li&gt;
+&lt;li&gt;将这个字节流代表的静态存储结构转为方法区运行时数据结构&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;在内存中生成一个代码这个类的java.lang.Class对象&lt;/strong&gt;，作为方法区这个类的各种数据的访问入口&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;结论：类加载为懒加载&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;阶段二：链接&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;验证：验证阶段主要是为了为了确保Class文件的字节流中包含的信息符合虚拟机要求，并且不会危害虚拟机&lt;/li&gt;
+&lt;li&gt;准备：
+&lt;ul&gt;
+&lt;li&gt;为类的&lt;strong&gt;静态变量&lt;/strong&gt;分配内存并且设置该类变量的默认初始值，即&lt;strong&gt;赋初值&lt;/strong&gt;【赋的默认值】&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实例变量&lt;/strong&gt;是在创建对象的时候完成赋值，且实例变量随着对象一起分配到Java堆中&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;final修饰的常量&lt;/strong&gt;在编译的时候会分配，准备阶段直接完成赋值，即没有赋初值这一步。被所有线程所有对象共享&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;解析：将&lt;strong&gt;符号引用&lt;/strong&gt;替换为&lt;strong&gt;直接引用&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;符号引用：以一组&lt;strong&gt;符号来描述&lt;/strong&gt;所引用的目标，符号可以是任何形式的&lt;strong&gt;字面量&lt;/strong&gt;，只要使用时能无歧义地定位到目标即可&lt;/li&gt;
+&lt;li&gt;直接引用：可以&lt;strong&gt;直接&lt;/strong&gt;指向目标的指针，而直接引用必须引用的目标已经&lt;strong&gt;在内存中存在&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;阶段三：初始化&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;​	初始化阶段是执行类构造器 &lt;clinit&gt;的过程。这一步主要的目的是：根据程序员程序编码制定的主观计划去初始化类变量和其他资源。&lt;/p&gt;
+&lt;h3 id=&#34;类加载器的作用&#34;&gt;类加载器的作用
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://z221224.github.io/yuan/yuan/image-20231107023154483.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;负责加载class文件，class文件在文件开头有的文件标识**（CA FE BA BE）**，并且ClassLoader只负责class文件的加载，至于它是否可以运行，则由Execution Engine决定。&lt;/p&gt;
+&lt;h3 id=&#34;类加载器分类&#34;&gt;类加载器分类
+&lt;/h3&gt;&lt;p&gt;分为四种，前三种为虚拟机自带的加载器。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;启动类加载器（BootstrapClassLoader）：由C++实现。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;扩展类加载器（ExtClassLoader/PlatformClassLoader）：由Java实现，派生自ClassLoader类。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;应用程序类加载器（AppClassLoader）：也叫系统类加载器。由Java实现，派生自ClassLoader类。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;自定义加载器 ：程序员可以定制类的加载方式，派生自ClassLoader类。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Java 9之前的ClassLoader&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bootstrap ClassLoader加载$JAVA_HOME中【jre/lib/rt.jar】，加载JDK中的核心类库&lt;/li&gt;
+&lt;li&gt;ExtClassLoader加载相对次要、但又通用的类，主要包括$JAVA_HOME中【jre/lib/ext/*.jar】或-Djava.ext.dirs指定目录下的jar包&lt;/li&gt;
+&lt;li&gt;AppClassLoader加载-cp指定的类，加载用户类路径中指定的jar包及目录中class&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Java 9及之后的ClassLoader&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Bootstrap ClassLoader，使用了模块化设计，加载【lib/modules】启动时的基础模块类，java.base、java.management、java.xml&lt;/li&gt;
+&lt;li&gt;ExtClassLoader更名为PlatformClassLoader，使用了模块化设计，加载【lib/modules】中平台相关模块，如java.scripting、java.compiler。&lt;/li&gt;
+&lt;li&gt;AppClassLoader加载-cp，-mp指定的类，加载用户类路径中指定的jar包及目录中class&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;双亲委派模型&#34;&gt;双亲委派模型
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5c%e5%8f%8c%e4%ba%b2%e5%a7%94%e6%b4%be%e6%a8%a1%e5%9e%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，&lt;strong&gt;而是把请求委托给父加载器去完成，依次向上&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1、当AppClassLoader加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器PlatformClassLoader去完成。&lt;/li&gt;
+&lt;li&gt;2、当PlatformClassLoader加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器BootStrapClassLoader去完成。&lt;/li&gt;
+&lt;li&gt;3、如果BootStrapClassLoader加载失败，会用PlatformClassLoader来尝试加载；&lt;/li&gt;
+&lt;li&gt;4、若PlatformClassLoader也加载失败，则会使用AppClassLoader来加载&lt;/li&gt;
+&lt;li&gt;5、如果AppClassLoader也加载失败，则会报出异常ClassNotFoundException&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;其实这就是所谓的双亲委派模型。简单来说：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上。&lt;/p&gt;
+&lt;p&gt;目的：&lt;/p&gt;
+&lt;p&gt;一，性能，避免重复加载；&lt;/p&gt;
+&lt;p&gt;二，安全性，避免核心类被修改。&lt;/p&gt;
+&lt;h2 id=&#34;方法区method-area&#34;&gt;方法区Method Area
+&lt;/h2&gt;&lt;h3 id=&#34;方法区存储什么&#34;&gt;方法区存储什么
+&lt;/h3&gt;&lt;p&gt;方法区是被所有&lt;strong&gt;线程共享&lt;/strong&gt;。《深入理解Java虚拟机》书中对方法区存储内容的&lt;strong&gt;经典描述&lt;/strong&gt;如下：它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810032835274.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;方法区演进细节&#34;&gt;方法区演进细节
+&lt;/h3&gt;&lt;p&gt;Hotspot中方法区的变化：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810034317894.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;方法区(永久代（JDK7及以前）、元空间（JDK8以后）)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;方法区&lt;/strong&gt;是 JVM 规范中定义的一块内存区域，用来存储类元数据、方法字节码、即时编译器需要的信息等&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;永久代&lt;/strong&gt;是 Hotspot 虚拟机对 JVM 规范的实现（1.8 之前）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;元空间&lt;/strong&gt;是 Hotspot 虚拟机对 JVM 规范的另一种实现（1.8 以后），使用本地内存作为这些信息的存储空间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;虚拟机栈stack&#34;&gt;虚拟机栈stack
+&lt;/h2&gt;&lt;h3 id=&#34;stack-栈是什么&#34;&gt;Stack 栈是什么？
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;栈也叫栈内存，主管Java程序的运行，是在线程创建时创建，每个线程都有自己的栈，它的生命周期是跟随线程的生命周期，线程结束栈内存也就释放，&lt;strong&gt;是线程私有的&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;线程上正在执行的每个方法都各自对应一个&lt;strong&gt;栈帧（Stack Frame）&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;栈运行原理&#34;&gt;栈运行原理
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;JVM对Java栈的操作只有两个，就是对栈帧的&lt;strong&gt;压栈和出栈&lt;/strong&gt;，遵循“先进后出”或者“后进先出”原则。&lt;/li&gt;
+&lt;li&gt;一个线程中只能有一个正在执行的方法（当前方法），因此对应只会有一个活动的&lt;strong&gt;当前栈帧&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810131723296.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;当一个方法1（main方法）被调用时就产生了一个栈帧1 并被压入到栈中，栈帧1位于栈底位置&lt;/p&gt;
+&lt;p&gt;方法1又调用了方法2，于是产生栈帧2 也被压入栈，&lt;/p&gt;
+&lt;p&gt;方法2又调用了方法3，于是产生栈帧3 也被压入栈，&lt;/p&gt;
+&lt;p&gt;……&lt;/p&gt;
+&lt;p&gt;执行完毕后，先弹出栈帧4，再弹出栈帧3，再弹出栈帧2，再弹出栈帧1，线程结束，栈释放。&lt;/p&gt;
+&lt;h3 id=&#34;栈存储什么&#34;&gt;栈存储什么?
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810133839557.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;局部变量表local-variables&#34;&gt;局部变量表（Local Variables）
+&lt;/h4&gt;&lt;p&gt;也叫本地变量表。&lt;/p&gt;
+&lt;p&gt;作用：存储方法参数和方法体内的局部变量：8种基本类型变量、对象引用（reference）。&lt;/p&gt;
+&lt;p&gt;可以用如下方式查看字节码中一个方法内定义的的局部变量，当程序运行时，这些局部变量会被加载到局部变量表中。&lt;/p&gt;
+&lt;p&gt;查看局部变量：&lt;/p&gt;
+&lt;p&gt;可以使用javap -  &lt;em&gt;.class&lt;/em&gt;* 命令，或者idea中的&lt;strong&gt;jclasslib&lt;/strong&gt;插件。&lt;/p&gt;
+&lt;p&gt;注意：以下方式看到的是加载到方法区中的字节码中的局部变量表，当程序运行时，局部变量表会被动态的加载到栈帧中的局部变量表中&lt;/p&gt;
+&lt;h4 id=&#34;操作数栈operand-stack&#34;&gt;操作数栈（Operand Stack）
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;**作用：**也是一个栈，在方法执行过程中根据字节码指令记录当前操作的数据，将它们入栈或出栈。用于保存计算过程的中间结果，同时作为计算过程中变量的临时存储空间。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;动态链接dynamic-linking&#34;&gt;动态链接（Dynamic Linking）
+&lt;/h4&gt;&lt;p&gt;**作用：**可以知道当前帧执行的是哪个方法。**指向运行时常量池中方法的符号引用。**程序真正执行时，类加载到内存中后，符号引用会换成直接引用。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;DynamicLinkingDemo&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;methodA&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(){&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;methodB&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;c1&#34;&gt;//方法A引用方法B&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;methodB&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(){&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811164717355.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;方法返回地址return-address&#34;&gt;方法返回地址（Return Address）
+&lt;/h4&gt;&lt;blockquote&gt;
+&lt;p&gt;**作用：**可以知道调用完当前方法后，上一层方法接着做什么，&lt;strong&gt;即“return”到什么位置去&lt;/strong&gt;。存储当前方法调用完毕&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20230903070857954.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;完整的内存结构图如下&#34;&gt;完整的内存结构图如下
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811170038117.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;栈溢出&#34;&gt;栈溢出
+&lt;/h4&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-java&#34; data-lang=&#34;java&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt;/**
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt; * 未设置栈大小默认：11416次
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt; * 设置VM参数：-Xss256k 2475次
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cm&#34;&gt; */&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;class&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;StackOOMDemo&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;int&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;count&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;public&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kd&#34;&gt;static&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;kt&#34;&gt;void&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;String&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;[]&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;System&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;out&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;na&#34;&gt;println&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;count&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;count&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;++&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;        &lt;/span&gt;&lt;span class=&#34;n&#34;&gt;main&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;args&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;常见问题栈溢出&lt;/strong&gt;：Exception in thread &amp;ldquo;main&amp;rdquo; java.lang.StackOverflowError通常出现在递归调用时。&lt;/p&gt;
+&lt;p&gt;问题辨析：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;垃圾回收是否涉及栈内存？&lt;/p&gt;
+&lt;p&gt;不涉及，因为栈内存在方法调用结束后都会自动弹出栈。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;方法内的局部变量是线程安全的吗？&lt;/p&gt;
+&lt;p&gt;当方法内局部变量没有逃离方法的作用范围时线程安全，&lt;strong&gt;因为一个线程对应一个栈，每调用一个方法就会新产生一个栈桢，都是线程私有的局部变量&lt;/strong&gt;，当变量是static时则不安全，因为是线程共享的。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;设置栈的大小&#34;&gt;设置栈的大小
+&lt;/h4&gt;&lt;p&gt;// 使用配置，设置栈为1MB，下面可以3选一
+-Xss1m&lt;br&gt;
+-Xss1024k
+-Xss1048576
+完整的写法是： -XX:ThreadStackSize=1m&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240727124133193.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;堆heap&#34;&gt;堆heap
+&lt;/h2&gt;&lt;h3 id=&#34;堆体系概述&#34;&gt;堆体系概述
+&lt;/h3&gt;&lt;h4 id=&#34;堆栈方法区的关系&#34;&gt;堆、栈、方法区的关系
+&lt;/h4&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812031325678.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;HotSpot是使用指针的方式来访问对象：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Java堆中会存放指向类元数据的地址&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Java栈中的reference存储的是指向堆中的对象的地址&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240103070913978.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;堆空间概述&#34;&gt;堆空间概述
+&lt;/h4&gt;&lt;ul&gt;
+&lt;li&gt;一个Java程序运行起来对应一个进程，一个进程对应一个JVM实例，一个JVM实例中有一个运行时数据区。&lt;/li&gt;
+&lt;li&gt;堆是Java内存管理的核心区域，在JVM启动的时候被创建，堆内存的大小是可以调节的。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;分代空间&#34;&gt;分代空间
+&lt;/h4&gt;&lt;h5 id=&#34;堆空间划分&#34;&gt;堆空间划分
+&lt;/h5&gt;&lt;p&gt;堆内存&lt;strong&gt;逻辑&lt;/strong&gt;上分为三部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Young Generation Space  				新生代/年轻代                    Young/New&lt;/li&gt;
+&lt;li&gt;Tenured generation space  	       养老代/老年代                   Old/Tenured&lt;/li&gt;
+&lt;li&gt;Permanent Space/Meta Space     永久代/元空间                    Permanent/Meta&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;新生代又划分为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;新生代又分为两部分： 伊甸园区（Eden space）和幸存者区（Survivor pace） 。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;幸存者区有两个： 0区（Survivor 0 space）和1区（Survivor 1 space）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;jdk17及之前堆空间&#34;&gt;JDK1.7及之前堆空间
+&lt;/h5&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812013015949.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h5 id=&#34;jdk18及之后堆空间&#34;&gt;JDK1.8及之后堆空间
+&lt;/h5&gt;&lt;p&gt;&lt;img src=&#34;E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812013031738.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;**注意：**方法区（具体的实现是永久代和元空间）逻辑上是堆空间的一部分，但是虚拟机的实现中将方法区和堆分开了，如下图：&lt;/p&gt;
 </description>
         </item>
         <item>

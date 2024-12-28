@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\r**JVM的作用：**加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\n**JVM的特点：**一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型。每个方法被执行的时候都会创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\rJVM的作用：加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\nJVM的特点：一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型**。每个方法被执行的时候都会创建一个**栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n注意：\n多线程共享方法区和堆； Java栈、本地方法栈、程序计数器是每个线程私有的。 执行引擎Execution Engine\rExecution Engine执行引擎负责解释命令(将字节码指令解释编译为机器码指令)，提交操作系统执行。\n">
 <title>JVM</title>
 
 <link rel='canonical' href='https://z221224.github.io/yuan/p/jvm/'>
 
 <link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="JVM">
-<meta property='og:description' content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\r**JVM的作用：**加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\n**JVM的特点：**一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型。每个方法被执行的时候都会创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n">
+<meta property='og:description' content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\rJVM的作用：加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\nJVM的特点：一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型**。每个方法被执行的时候都会创建一个**栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n注意：\n多线程共享方法区和堆； Java栈、本地方法栈、程序计数器是每个线程私有的。 执行引擎Execution Engine\rExecution Engine执行引擎负责解释命令(将字节码指令解释编译为机器码指令)，提交操作系统执行。\n">
 <meta property='og:url' content='https://z221224.github.io/yuan/p/jvm/'>
 <meta property='og:site_name' content='米 粒'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-12-28T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-12-28T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="JVM">
-<meta name="twitter:description" content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\r**JVM的作用：**加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\n**JVM的特点：**一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型。每个方法被执行的时候都会创建一个栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n">
+<meta name="twitter:description" content="JVM快速入门\r从面试开始：\n1.JVM是什么? JVM的内存区域分为哪些?\n2.什么是OOM? 什么是StackoverflowError? 有哪些方法分析?\n3.JVM 的常用参数调优你知道哪些?\n4.GC是什么? 为什么需要GC?\n5.什么是类加载器?\n什么是JVM\rJVM：Java Virtual Machine，Java虚拟机\n**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。\n为什么要在程序和操作系统中间添加一个JVM？\nJava 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以实现跨平台了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于一次编译，处处运行，能够做到这一点 JVM 功不可没。\n主流虚拟机有哪些？\rJCP组织（Java Community Process 开放的国际组织 ）：Hotspot虚拟机（Open JDK版），sun2006年开源 Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费 BEA：JRockit虚拟机 IBM：J9虚拟机 阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。 结构图\rJVM的作用：加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序\nJVM的特点：一次编译到处运行、自动内存管理、自动垃圾回收\n类加载器子系统：将字节码文件（.class）加载到内存中的方法区\n运行时数据区：\n方法区：存储已被虚拟机加载的类的元数据信息(元空间)。也就是存储字节码信息。 堆：存放对象实例，几乎所有的对象实例都在这里分配内存。 虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型**。每个方法被执行的时候都会创建一个**栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息 本地方法栈：本地方法栈则是记录虚拟机当前使用到的native方法。 程序计数器：当前线程所执行的字节码的行号指示器。 本地方法接口：虚拟机使用到的native类型的方法，负责调用操作系统类库。（例如Thread类中有很多Native方法的调用）\n执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。\n注意：\n多线程共享方法区和堆； Java栈、本地方法栈、程序计数器是每个线程私有的。 执行引擎Execution Engine\rExecution Engine执行引擎负责解释命令(将字节码指令解释编译为机器码指令)，提交操作系统执行。\n">
     </head>
     <body class="
     article-page
@@ -265,10 +265,59 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#jvm快速入门">JVM快速入门</a></li>
-    <li><a href="#什么是jvm">什么是JVM</a></li>
-    <li><a href="#主流虚拟机有哪些">主流虚拟机有哪些？</a></li>
-    <li><a href="#结构图">结构图</a></li>
+    <li><a href="#jvm快速入门">JVM快速入门</a>
+      <ol>
+        <li><a href="#什么是jvm">什么是JVM</a></li>
+        <li><a href="#主流虚拟机有哪些">主流虚拟机有哪些？</a></li>
+        <li><a href="#结构图">结构图</a></li>
+        <li><a href="#执行引擎execution-engine">执行引擎Execution Engine</a></li>
+        <li><a href="#本地方法接口native-interface">本地方法接口Native Interface</a></li>
+        <li><a href="#native-method-stack">Native Method Stack</a></li>
+        <li><a href="#pc寄存器程序计数器">PC寄存器(程序计数器)</a></li>
+      </ol>
+    </li>
+    <li><a href="#类加载器classloader">类加载器ClassLoader</a>
+      <ol>
+        <li><a href="#类的加载过程">类的加载过程</a></li>
+        <li><a href="#类加载器的作用">类加载器的作用</a></li>
+        <li><a href="#类加载器分类">类加载器分类</a></li>
+        <li><a href="#双亲委派模型">双亲委派模型</a></li>
+      </ol>
+    </li>
+    <li><a href="#方法区method-area">方法区Method Area</a>
+      <ol>
+        <li><a href="#方法区存储什么">方法区存储什么</a></li>
+        <li><a href="#方法区演进细节">方法区演进细节</a></li>
+      </ol>
+    </li>
+    <li><a href="#虚拟机栈stack">虚拟机栈stack</a>
+      <ol>
+        <li><a href="#stack-栈是什么">Stack 栈是什么？</a></li>
+        <li><a href="#栈运行原理">栈运行原理</a></li>
+        <li><a href="#栈存储什么">栈存储什么?</a>
+          <ol>
+            <li><a href="#局部变量表local-variables">局部变量表（Local Variables）</a></li>
+            <li><a href="#操作数栈operand-stack">操作数栈（Operand Stack）</a></li>
+            <li><a href="#动态链接dynamic-linking">动态链接（Dynamic Linking）</a></li>
+            <li><a href="#方法返回地址return-address">方法返回地址（Return Address）</a></li>
+            <li><a href="#完整的内存结构图如下">完整的内存结构图如下</a></li>
+            <li><a href="#栈溢出">栈溢出</a></li>
+            <li><a href="#设置栈的大小">设置栈的大小</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#堆heap">堆heap</a>
+      <ol>
+        <li><a href="#堆体系概述">堆体系概述</a>
+          <ol>
+            <li><a href="#堆栈方法区的关系">堆、栈、方法区的关系</a></li>
+            <li><a href="#堆空间概述">堆空间概述</a></li>
+            <li><a href="#分代空间">分代空间</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
   </ol>
 </nav>
         </div>
@@ -341,7 +390,7 @@
 
 
                 <time class="article-time--reading">
-                    阅读时长: 1 分钟
+                    阅读时长: 2 分钟
                 </time>
             </div>
         
@@ -363,23 +412,30 @@
 <p>3.JVM 的常用参数调优你知道哪些?</p>
 <p>4.GC是什么? 为什么需要GC?</p>
 <p>5.什么是类加载器?</p>
-<h2 id="什么是jvm">什么是JVM
-</h2><p>JVM：<strong>J</strong>ava <strong>V</strong>irtual <strong>M</strong>achine，Java虚拟机</p>
+<h3 id="什么是jvm">什么是JVM
+</h3><p>JVM：<strong>J</strong>ava <strong>V</strong>irtual <strong>M</strong>achine，Java虚拟机</p>
 <p>**位置：**JVM是运行在操作 系统之上的，它与硬件没有直接的交互。</p>
 <p>为什么要在程序和操作系统中间添加一个JVM？</p>
 <p>Java 是一门抽象程度特别高的语言，提供了自动内存管理等一系列的特性。这些特性直接在操作系统上实现是不太可能的，所以就需要 JVM 进行一番转换。有了 JVM 这个抽象层之后，Java 就可以<strong>实现跨平台</strong>了。JVM 只需要保证能够正确执行 .class 文件，就可以运行在诸如 Linux、Windows、MacOS 等平台上了。而 Java 跨平台的意义在于<strong>一次编译，处处运行</strong>，能够做到这一点 JVM 功不可没。</p>
-<h2 id="主流虚拟机有哪些">主流虚拟机有哪些？
-</h2><ul>
+<h3 id="主流虚拟机有哪些">主流虚拟机有哪些？
+</h3><ul>
 <li>JCP组织（Java Community Process 开放的国际组织 ）：<strong>Hotspot虚拟机</strong>（Open JDK版），sun2006年开源</li>
 <li>Oracle：Hotspot虚拟机（Oracle JDK版），闭源，允许个人使用，商用收费</li>
 <li>BEA：JRockit虚拟机</li>
 <li>IBM：J9虚拟机</li>
 <li>阿里巴巴：Dragonwell JDK（龙井虚拟机），电商物流金融等领域，高性能要求。</li>
 </ul>
-<h2 id="结构图">结构图
-</h2><p>**JVM的作用：**加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序</p>
-<p>**JVM的特点：**一次编译到处运行、自动内存管理、自动垃圾回收</p>
-<img src="image-20240801163747777.png">
+<h3 id="结构图">结构图
+</h3><p>JVM的作用：加载并执行Java字节码文件(.class) - 加载字节码文件、分配内存（运行时数据区）、运行程序</p>
+<p>JVM的特点：一次编译到处运行、自动内存管理、自动垃圾回收</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240801163747777.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
 <ul>
 <li>
 <p>类加载器子系统：将字节码文件（.class）加载到内存中的方法区</p>
@@ -388,8 +444,8 @@
 <p>运行时数据区：</p>
 <ul>
 <li>方法区：存储已被虚拟机加载的类的<strong>元数据信息(元空间)</strong>。也就是存储字节码信息。</li>
-<li>堆：<strong>存放对象实例</strong>，几乎所有的对象实例都在这里分配内存。</li>
-<li>虚拟机栈(java栈)：虚拟机栈描述的是<strong>Java方法执行的内存模型</strong>。每个方法被执行的时候都会创建一个<strong>栈帧</strong>（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息</li>
+<li>堆：存放对象实例，几乎所有的对象实例都在这里分配内存。</li>
+<li>虚拟机栈(java栈)：虚拟机栈描述的是Java方法执行的内存模型**。每个方法被执行的时候都会创建一个**栈帧（Stack Frame）用于存储局部变量表、操作数栈、动态链接、方法出口等信息</li>
 <li>本地方法栈：本地方法栈则是<strong>记录</strong>虚拟机当前使用到的<strong>native方法</strong>。</li>
 <li>程序计数器：当前线程所执行的字节码的<strong>行号指示器</strong>。</li>
 </ul>
@@ -401,6 +457,393 @@
 <p>执行引擎：包含解释器、即时编译器和垃圾收集器 ，负责执行加载到JVM中的字节码指令。</p>
 </li>
 </ul>
+<p><strong>注意：</strong></p>
+<ul>
+<li>多线程共享方法区和堆；</li>
+<li>Java栈、本地方法栈、程序计数器是每个线程私有的。</li>
+</ul>
+<h3 id="执行引擎execution-engine">执行引擎Execution Engine
+</h3><p>Execution Engine执行引擎负责解释命令(将字节码指令解释编译为机器码指令)，提交操作系统执行。</p>
+<p>JVM执行引擎通常由两个主要组成部分构成：<strong>解释器和即时编译器（Just-In-Time Compiler，JIT Compiler）</strong>。</p>
+<ol>
+<li>解释器：当Java字节码被加载到内存中时，解释器逐条解析和执行字节码指令。解释器逐条执行字节码，将每条指令转换为对应平台上的本地机器指令。由于解释器逐条解析执行，因此执行速度相对较慢。但解释器具有优点，即可立即执行字节码，无需等待编译过程。</li>
+<li>即时编译器（JIT Compiler）：为了提高执行速度，JVM还使用即时编译器。即时编译器将字节码动态地编译为本地机器码，以便直接在底层硬件上执行。即时编译器根据运行时的性能数据和优化技术，对经常执行的热点代码进行优化，从而提高程序的性能。即时编译器可以将经过优化的代码缓存起来，以便下次再次执行时直接使用。</li>
+</ol>
+<p>JVM执行引擎还包括其他一些重要的组件，如<strong>即时编译器后端、垃圾回收器、线程管理器</strong>等。这些组件共同协作，使得Java程序能够在不同的操作系统和硬件平台上运行，并且具备良好的性能。</p>
+<h3 id="本地方法接口native-interface">本地方法接口Native Interface
+</h3><p>本地接口的作用是融合不同的编程语言为 Java 所用，于是就在内存中专门开辟了一块区域处理标记为native的代码，它的具体做法是 Native Method Stack中登记 native方法，在Execution Engine 执行时加载native libraies。</p>
+<p>例如<strong>Thread类</strong>中有一些标记为native的方法：</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811105702139.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="native-method-stack">Native Method Stack
+</h3><p>本地方法栈存储了从Java代码中调用本地方法时所需的信息。是<strong>线程私有</strong>的。</p>
+<h3 id="pc寄存器程序计数器">PC寄存器(程序计数器)
+</h3><p>每个线程都有一个程序计数器，是<strong>线程私有</strong>的，就是一个指针，指向方法区中的方法字节码（用来存储指向下一条指令的地址，即 将要执行的指令代码），由执行引擎读取下一条指令，是一个非常小的内存空间，几乎可以忽略不记。</p>
+<h2 id="类加载器classloader">类加载器ClassLoader
+</h2><ul>
+<li>负责加载class文件，class文件在文件开头有特定的文件标识(cafe babe)。</li>
+<li>ClassLoader只负责class文件的加载，至于它是否可以运行，则由Execution Engine决定。</li>
+<li>加载的类信息存放到方法区的内存空间。</li>
+</ul>
+<h3 id="类的加载过程">类的加载过程
+</h3><p><strong>类加载过程</strong>主要分为三个步骤：<strong>加载</strong>、<strong>链接</strong>、<strong>初始化</strong>，而其中链接过程又分为三个步骤：<strong>验证</strong>、<strong>准备</strong>、<strong>解析</strong>，加上<strong>使用、卸载</strong>两个步骤统称为为类的生命周期。</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20221110122305222.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><strong>阶段一：加载</strong></p>
+<ul>
+<li>通过一个类的全限定名获取定义此类的二进制字节流</li>
+<li>将这个字节流代表的静态存储结构转为方法区运行时数据结构</li>
+<li><strong>在内存中生成一个代码这个类的java.lang.Class对象</strong>，作为方法区这个类的各种数据的访问入口</li>
+</ul>
+<p>结论：类加载为懒加载</p>
+<p><strong>阶段二：链接</strong></p>
+<ul>
+<li>验证：验证阶段主要是为了为了确保Class文件的字节流中包含的信息符合虚拟机要求，并且不会危害虚拟机</li>
+<li>准备：
+<ul>
+<li>为类的<strong>静态变量</strong>分配内存并且设置该类变量的默认初始值，即<strong>赋初值</strong>【赋的默认值】</li>
+<li><strong>实例变量</strong>是在创建对象的时候完成赋值，且实例变量随着对象一起分配到Java堆中</li>
+<li><strong>final修饰的常量</strong>在编译的时候会分配，准备阶段直接完成赋值，即没有赋初值这一步。被所有线程所有对象共享</li>
+</ul>
+</li>
+<li>解析：将<strong>符号引用</strong>替换为<strong>直接引用</strong>
+<ul>
+<li>符号引用：以一组<strong>符号来描述</strong>所引用的目标，符号可以是任何形式的<strong>字面量</strong>，只要使用时能无歧义地定位到目标即可</li>
+<li>直接引用：可以<strong>直接</strong>指向目标的指针，而直接引用必须引用的目标已经<strong>在内存中存在</strong></li>
+</ul>
+</li>
+</ul>
+<p><strong>阶段三：初始化</strong></p>
+<p>​	初始化阶段是执行类构造器 <clinit>的过程。这一步主要的目的是：根据程序员程序编码制定的主观计划去初始化类变量和其他资源。</p>
+<h3 id="类加载器的作用">类加载器的作用
+</h3><p><img src="/yuan/image-20231107023154483.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>负责加载class文件，class文件在文件开头有的文件标识**（CA FE BA BE）**，并且ClassLoader只负责class文件的加载，至于它是否可以运行，则由Execution Engine决定。</p>
+<h3 id="类加载器分类">类加载器分类
+</h3><p>分为四种，前三种为虚拟机自带的加载器。</p>
+<ul>
+<li>
+<p>启动类加载器（BootstrapClassLoader）：由C++实现。</p>
+</li>
+<li>
+<p>扩展类加载器（ExtClassLoader/PlatformClassLoader）：由Java实现，派生自ClassLoader类。</p>
+</li>
+<li>
+<p>应用程序类加载器（AppClassLoader）：也叫系统类加载器。由Java实现，派生自ClassLoader类。</p>
+</li>
+<li>
+<p>自定义加载器 ：程序员可以定制类的加载方式，派生自ClassLoader类。</p>
+</li>
+</ul>
+<p><strong>Java 9之前的ClassLoader</strong></p>
+<ul>
+<li>Bootstrap ClassLoader加载$JAVA_HOME中【jre/lib/rt.jar】，加载JDK中的核心类库</li>
+<li>ExtClassLoader加载相对次要、但又通用的类，主要包括$JAVA_HOME中【jre/lib/ext/*.jar】或-Djava.ext.dirs指定目录下的jar包</li>
+<li>AppClassLoader加载-cp指定的类，加载用户类路径中指定的jar包及目录中class</li>
+</ul>
+<p><strong>Java 9及之后的ClassLoader</strong></p>
+<ul>
+<li>Bootstrap ClassLoader，使用了模块化设计，加载【lib/modules】启动时的基础模块类，java.base、java.management、java.xml</li>
+<li>ExtClassLoader更名为PlatformClassLoader，使用了模块化设计，加载【lib/modules】中平台相关模块，如java.scripting、java.compiler。</li>
+<li>AppClassLoader加载-cp，-mp指定的类，加载用户类路径中指定的jar包及目录中class</li>
+</ul>
+<h3 id="双亲委派模型">双亲委派模型
+</h3><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5c%e5%8f%8c%e4%ba%b2%e5%a7%94%e6%b4%be%e6%a8%a1%e5%9e%8b.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，<strong>而是把请求委托给父加载器去完成，依次向上</strong>：</p>
+<ul>
+<li>1、当AppClassLoader加载一个class时，它首先不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器PlatformClassLoader去完成。</li>
+<li>2、当PlatformClassLoader加载一个class时，它首先也不会自己去尝试加载这个类，而是把类加载请求委派给父类加载器BootStrapClassLoader去完成。</li>
+<li>3、如果BootStrapClassLoader加载失败，会用PlatformClassLoader来尝试加载；</li>
+<li>4、若PlatformClassLoader也加载失败，则会使用AppClassLoader来加载</li>
+<li>5、如果AppClassLoader也加载失败，则会报出异常ClassNotFoundException</li>
+</ul>
+<p>其实这就是所谓的双亲委派模型。简单来说：如果一个类加载器收到了类加载的请求，它首先不会自己去尝试加载这个类，而是把请求委托给父加载器去完成，依次向上。</p>
+<p>目的：</p>
+<p>一，性能，避免重复加载；</p>
+<p>二，安全性，避免核心类被修改。</p>
+<h2 id="方法区method-area">方法区Method Area
+</h2><h3 id="方法区存储什么">方法区存储什么
+</h3><p>方法区是被所有<strong>线程共享</strong>。《深入理解Java虚拟机》书中对方法区存储内容的<strong>经典描述</strong>如下：它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等：</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810032835274.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h3 id="方法区演进细节">方法区演进细节
+</h3><p>Hotspot中方法区的变化：</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810034317894.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p><strong>方法区(永久代（JDK7及以前）、元空间（JDK8以后）)</strong></p>
+<ul>
+<li><strong>方法区</strong>是 JVM 规范中定义的一块内存区域，用来存储类元数据、方法字节码、即时编译器需要的信息等</li>
+<li><strong>永久代</strong>是 Hotspot 虚拟机对 JVM 规范的实现（1.8 之前）</li>
+<li><strong>元空间</strong>是 Hotspot 虚拟机对 JVM 规范的另一种实现（1.8 以后），使用本地内存作为这些信息的存储空间</li>
+</ul>
+<h2 id="虚拟机栈stack">虚拟机栈stack
+</h2><h3 id="stack-栈是什么">Stack 栈是什么？
+</h3><ul>
+<li>栈也叫栈内存，主管Java程序的运行，是在线程创建时创建，每个线程都有自己的栈，它的生命周期是跟随线程的生命周期，线程结束栈内存也就释放，<strong>是线程私有的</strong>。</li>
+<li>线程上正在执行的每个方法都各自对应一个<strong>栈帧（Stack Frame）</strong>。</li>
+</ul>
+<h3 id="栈运行原理">栈运行原理
+</h3><ul>
+<li>JVM对Java栈的操作只有两个，就是对栈帧的<strong>压栈和出栈</strong>，遵循“先进后出”或者“后进先出”原则。</li>
+<li>一个线程中只能有一个正在执行的方法（当前方法），因此对应只会有一个活动的<strong>当前栈帧</strong>。</li>
+</ul>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810131723296.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>当一个方法1（main方法）被调用时就产生了一个栈帧1 并被压入到栈中，栈帧1位于栈底位置</p>
+<p>方法1又调用了方法2，于是产生栈帧2 也被压入栈，</p>
+<p>方法2又调用了方法3，于是产生栈帧3 也被压入栈，</p>
+<p>……</p>
+<p>执行完毕后，先弹出栈帧4，再弹出栈帧3，再弹出栈帧2，再弹出栈帧1，线程结束，栈释放。</p>
+<h3 id="栈存储什么">栈存储什么?
+</h3><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220810133839557.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h4 id="局部变量表local-variables">局部变量表（Local Variables）
+</h4><p>也叫本地变量表。</p>
+<p>作用：存储方法参数和方法体内的局部变量：8种基本类型变量、对象引用（reference）。</p>
+<p>可以用如下方式查看字节码中一个方法内定义的的局部变量，当程序运行时，这些局部变量会被加载到局部变量表中。</p>
+<p>查看局部变量：</p>
+<p>可以使用javap -  <em>.class</em>* 命令，或者idea中的<strong>jclasslib</strong>插件。</p>
+<p>注意：以下方式看到的是加载到方法区中的字节码中的局部变量表，当程序运行时，局部变量表会被动态的加载到栈帧中的局部变量表中</p>
+<h4 id="操作数栈operand-stack">操作数栈（Operand Stack）
+</h4><blockquote>
+<p>**作用：**也是一个栈，在方法执行过程中根据字节码指令记录当前操作的数据，将它们入栈或出栈。用于保存计算过程的中间结果，同时作为计算过程中变量的临时存储空间。</p>
+</blockquote>
+<h4 id="动态链接dynamic-linking">动态链接（Dynamic Linking）
+</h4><p>**作用：**可以知道当前帧执行的是哪个方法。**指向运行时常量池中方法的符号引用。**程序真正执行时，类加载到内存中后，符号引用会换成直接引用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">DynamicLinkingDemo</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodA</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">methodB</span><span class="p">();</span><span class="w"> </span><span class="c1">//方法A引用方法B</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">methodB</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811164717355.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h4 id="方法返回地址return-address">方法返回地址（Return Address）
+</h4><blockquote>
+<p>**作用：**可以知道调用完当前方法后，上一层方法接着做什么，<strong>即“return”到什么位置去</strong>。存储当前方法调用完毕</p>
+</blockquote>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20230903070857954.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h4 id="完整的内存结构图如下">完整的内存结构图如下
+</h4><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220811170038117.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h4 id="栈溢出">栈溢出
+</h4><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="cm">/**
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 未设置栈大小默认：11416次
+</span></span></span><span class="line"><span class="cl"><span class="cm"> * 设置VM参数：-Xss256k 2475次
+</span></span></span><span class="line"><span class="cl"><span class="cm"> */</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">StackOOMDemo</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">count</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">count</span><span class="o">++</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">main</span><span class="p">(</span><span class="n">args</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>常见问题栈溢出</strong>：Exception in thread &ldquo;main&rdquo; java.lang.StackOverflowError通常出现在递归调用时。</p>
+<p>问题辨析：</p>
+<ul>
+<li>
+<p>垃圾回收是否涉及栈内存？</p>
+<p>不涉及，因为栈内存在方法调用结束后都会自动弹出栈。</p>
+</li>
+<li>
+<p>方法内的局部变量是线程安全的吗？</p>
+<p>当方法内局部变量没有逃离方法的作用范围时线程安全，<strong>因为一个线程对应一个栈，每调用一个方法就会新产生一个栈桢，都是线程私有的局部变量</strong>，当变量是static时则不安全，因为是线程共享的。</p>
+</li>
+</ul>
+<h4 id="设置栈的大小">设置栈的大小
+</h4><p>// 使用配置，设置栈为1MB，下面可以3选一
+-Xss1m<br>
+-Xss1024k
+-Xss1048576
+完整的写法是： -XX:ThreadStackSize=1m</p>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240727124133193.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h2 id="堆heap">堆heap
+</h2><h3 id="堆体系概述">堆体系概述
+</h3><h4 id="堆栈方法区的关系">堆、栈、方法区的关系
+</h4><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812031325678.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>HotSpot是使用指针的方式来访问对象：</p>
+<ul>
+<li>
+<p>Java堆中会存放指向类元数据的地址</p>
+</li>
+<li>
+<p>Java栈中的reference存储的是指向堆中的对象的地址</p>
+</li>
+</ul>
+<p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20240103070913978.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h4 id="堆空间概述">堆空间概述
+</h4><ul>
+<li>一个Java程序运行起来对应一个进程，一个进程对应一个JVM实例，一个JVM实例中有一个运行时数据区。</li>
+<li>堆是Java内存管理的核心区域，在JVM启动的时候被创建，堆内存的大小是可以调节的。</li>
+</ul>
+<h4 id="分代空间">分代空间
+</h4><h5 id="堆空间划分">堆空间划分
+</h5><p>堆内存<strong>逻辑</strong>上分为三部分：</p>
+<ul>
+<li>Young Generation Space  				新生代/年轻代                    Young/New</li>
+<li>Tenured generation space  	       养老代/老年代                   Old/Tenured</li>
+<li>Permanent Space/Meta Space     永久代/元空间                    Permanent/Meta</li>
+</ul>
+<p>新生代又划分为：</p>
+<ul>
+<li>
+<p>新生代又分为两部分： 伊甸园区（Eden space）和幸存者区（Survivor pace） 。</p>
+</li>
+<li>
+<p>幸存者区有两个： 0区（Survivor 0 space）和1区（Survivor 1 space）。</p>
+</li>
+</ul>
+<h5 id="jdk17及之前堆空间">JDK1.7及之前堆空间
+</h5><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812013015949.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<h5 id="jdk18及之后堆空间">JDK1.8及之后堆空间
+</h5><p><img src="E:%5cstu%5cmy_blog%5chugo-log%5chugo%5ccontent%5cpost%5cJVM%5cimage-20220812013031738.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+<p>**注意：**方法区（具体的实现是永久代和元空间）逻辑上是堆空间的一部分，但是虚拟机的实现中将方法区和堆分开了，如下图：</p>
 
 </section>
 
