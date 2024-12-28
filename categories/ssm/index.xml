@@ -15,9 +15,15 @@
         <guid>https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/</guid>
         <description>&lt;h2 id=&#34;javaweb部分&#34;&gt;JavaWEB部分
 &lt;/h2&gt;&lt;h3 id=&#34;请描述转发和重定向的区别&#34;&gt;请描述转发和重定向的区别？
-&lt;/h3&gt;&lt;p&gt;1、请求次数： 转发一次，重定向两次  2、浏览器地址：转发不变，重定向改变  3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据  4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会  5、效率：转发浏览器一次请求效率高，重定向效率低  6、WEB-INF下资源：转发可以访问，重定向不可以&lt;/p&gt;
+&lt;/h3&gt;&lt;p&gt;1、请求次数： 转发一次，重定向两次&lt;/p&gt;
+&lt;p&gt;2、浏览器地址：转发不变，重定向改变&lt;/p&gt;
+&lt;p&gt;3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据&lt;/p&gt;
+&lt;p&gt;4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会&lt;/p&gt;
+&lt;p&gt;5、效率：转发浏览器一次请求效率高，重定向效率低&lt;/p&gt;
+&lt;p&gt;6、WEB-INF下资源：转发可以访问，重定向不可以&lt;/p&gt;
 &lt;h3 id=&#34;和的区别&#34;&gt;==和===的区别？
-&lt;/h3&gt;&lt;p&gt;1、==  只判断值是否相等，不考虑其数据类型是否相等  2、===既判断值相等，又判断数据类型相等&lt;/p&gt;
+&lt;/h3&gt;&lt;p&gt;1、==  只判断值是否相等，不考虑其数据类型是否相等&lt;/p&gt;
+&lt;p&gt;2、===既判断值相等，又判断数据类型相等&lt;/p&gt;
 &lt;h3 id=&#34;http-常见的状态码有哪些&#34;&gt;Http 常见的状态码有哪些？
 &lt;/h3&gt;&lt;p&gt;200 OK //客户端请求成功&lt;/p&gt;
 &lt;p&gt;301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置&lt;/p&gt;
@@ -223,14 +229,69 @@
 &lt;h4 id=&#34;mybatis如何获取自动生成的主键值如何完成mysql的批量操作&#34;&gt;MyBatis如何获取自动生成的(主)键值？如何完成MySQL的批量操作
 &lt;/h4&gt;&lt;p&gt;在&lt;insert&gt;标签中使用 useGeneratedKeys  和 keyProperty 两个属性来获取自动生成的主键值。  例如:              &lt;insert id=&#34;insertname&#34;     usegeneratedkeys=&#34;true&#34; keyproperty=&#34;id&#34;&gt;       insert into names (name) values (#{name})     &lt;/insert&gt;            MyBatis完成MySQL的批量操作主要是通过&lt;foreache&gt;标签来拼装相应的SQL语句。  例如:              &lt;insert id=&#34;insertBatch&#34; &gt;       insert into tbl_employee(last_name,email,gender,d_id) values       &lt;foreach collection=&#34;emps&#34; item=&#34;curr_emp&#34; separator=&#34;,&#34;&gt;         (#{curr_emp.lastName},#{curr_emp.email},#{curr_emp.gender},#{curr_emp.dept.id})       &lt;/foreach&gt;     &lt;/insert&gt;&lt;/p&gt;
 &lt;h4 id=&#34;简述mybatis的单个参数多个参数如何传递及如何取值&#34;&gt;简述MyBatis的单个参数、多个参数如何传递及如何取值
-&lt;/h4&gt;&lt;p&gt;1、MyBatis传递单个参数，如果是普通类型(String+8个基本)的，取值时在#{}中可以任意指定，如果是对象类型的，则在#{}中使用对象的属性名来取值  2、MyBatis传递多个参数，默认情况下，MyBatis会对多个参数进行封装Map. 取值时  在#{}可以使用012 .. 或者是param1 param2..   3、MyBatis传递多个参数，建议使用命名参数，在Mapper接口的方法的形参前面使用  @Param() 来指定封装Map时用的key. 取值时在#{}中使用@Param指定的key.             方法一：顺序传参    public User select(String name,int id);    &lt;select id=&#34;select&#34;    resultMap=&#34;UserResultMap&#34;&gt;    select * from user where name=#{0} and id=#{1}    &lt;/select&gt;    #{}里面的数字代表你传入参数的顺序。    这种方法不建议使用，sql层表达不直观，且一旦顺序调整容易出错。    方法二：@Param注解传参    public User select(@Param(&amp;ldquo;paramName&amp;rdquo;) String    name,@Param(&amp;ldquo;paramId&amp;rdquo;) int id);    &lt;select id=&#34;select&#34;    resultMap=&#34;UserResultMap&#34;&gt;    select * from user where name=#{paramName} and id=#{paramId}    &lt;/select&gt;    #{}里面的名称对应的是注解 @Param括号里面修饰的名称。    这种方法在参数不多的情况还是比较直观的，推荐使用。    方法三：Map传参    Map&amp;lt;String,Object&amp;gt; map = new HashMap&amp;lt;String, Object&amp;gt;();    map.put(&amp;ldquo;mapName&amp;rdquo;,&amp;ldquo;zhangsan&amp;rdquo;);    map.put(&amp;ldquo;mapId&amp;rdquo;,2);    public User select(Map&amp;lt;String,Object&amp;gt; map);    &lt;select id=&#34;select&#34;    parameterType=&#34;java.util.Map&#34;    resultMap=&#34;UserResultMap&#34;&gt;    select * from user where name=#{mapName} and id=#{mapId}    &lt;/select&gt;    #{}里面的名称对应的是 Map里面的key名称。    这种方法适合传递多个参数，且参数易变能灵活传递的情况。&lt;/p&gt;
+&lt;/h4&gt;&lt;p&gt;1、MyBatis传递单个参数，如果是普通类型(String+8个基本)的，取值时在#{}中可以任意指定，如果是对象类型的，则在#{}中使用对象的属性名来取值&lt;/p&gt;
+&lt;p&gt;2、MyBatis传递多个参数，默认情况下，MyBatis会对多个参数进行封装Map. 取值时  在#{}可以使用012 .. 或者是param1 param2..   3、MyBatis传递多个参数，建议使用命名参数，在Mapper接口的方法的形参前面使用  @Param() 来指定封装Map时用的key. 取值时在#{}中使用@Param指定的key.&lt;/p&gt;
+&lt;p&gt;方法一：顺序传参&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;public User select(String name,int id);   
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &amp;lt;select id=&amp;#34;select&amp;#34;    resultMap=&amp;#34;UserResultMap&amp;#34;&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; 	select * from user where name=#{0} and id=#{1}   
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt; &amp;lt;/select&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;#{}里面的数字代表你传入参数的顺序。    这种方法不建议使用，sql层表达不直观，且一旦顺序调整容易出错。&lt;/p&gt;
+&lt;p&gt;方法二：@Param注解传参&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;public User select(@Param(&amp;#34;paramName&amp;#34;) String    name,@Param(&amp;#34;paramId&amp;#34;) int id);    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;lt;select id=&amp;#34;select&amp;#34;    resultMap=&amp;#34;UserResultMap&amp;#34;&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	select * from user where name=#{paramName} and id=#{paramId}  &amp;lt;/select&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;#{}里面的名称对应的是注解 @Param括号里面修饰的名称。    这种方法在参数不多的情况还是比较直观的，推荐使用。&lt;/p&gt;
+&lt;p&gt;方法三：Map传参&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Map&amp;lt;String,Object&amp;gt; map = new HashMap&amp;lt;String, Object&amp;gt;();    map.put(&amp;#34;mapName&amp;#34;,&amp;#34;zhangsan&amp;#34;);    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;map.put(&amp;#34;mapId&amp;#34;,2);    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;public User select(Map&amp;lt;String,Object&amp;gt; map);    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&amp;lt;select id=&amp;#34;select&amp;#34;    parameterType=&amp;#34;java.util.Map&amp;#34;    resultMap=&amp;#34;UserResultMap&amp;#34;&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;	select * from user where name=#{mapName} and id=#{mapId}    &amp;lt;/select&amp;gt;    
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;#{}里面的名称对应的是 Map里面的key名称。    这种方法适合传递多个参数，且参数易变能灵活传递的情况。&lt;/p&gt;
 &lt;h4 id=&#34;讲述下mybatis多表映射中association与collection区别&#34;&gt;讲述下MyBatis多表映射中association与collection区别
-&lt;/h4&gt;&lt;p&gt;在MyBatis多表映射中，association和collection是两种不同的映射类型，用于处理关联关系和一对多的关系。  association： association用于描述两个表之间的一对一关系。它表示一个复杂类型（Java对象）在另一个表中的外键关联。在映射文件中，我们可以使用association来定义关联关系，指定外键列和关联的结果映射。  例如，假设我们有两个表：Order（订单）和User（用户），一个订单只对应一个用户。我们可以在Order的映射文件中使用association来描述订单和用户之间的关联关系：  &lt;resultMap  id=&#34;OrderResultMap&#34; type=&#34;Order&#34;&gt;    &lt;id property=&#34;orderId&#34;  column=&#34;order_id&#34; /&gt;    &lt;result property=&#34;orderName&#34;  column=&#34;order_name&#34; /&gt;    &lt;association property=&#34;user&#34;  javaType=&#34;User&#34;&gt;      &lt;id property=&#34;userId&#34;  column=&#34;user_id&#34; /&gt;      &lt;result  property=&#34;username&#34; column=&#34;username&#34; /&gt;      &lt;result property=&#34;email&#34;  column=&#34;email&#34; /&gt;    &lt;/association&gt;  &lt;/resultMap&gt;  这里，association指定了外键列order_id以及关联的结果映射User。  collection： collection用于处理一对多的关系，表示一个表中的一条记录关联多个另一个表的记录。在映射文件中，我们可以使用collection来定义一对多的映射关系。  例如，假设我们有两个表：Department（部门）和Employee（员工），一个部门拥有多个员工。我们可以在Department的映射文件中使用collection来描述部门和员工之间的关系：     &lt;resultMap  id=&#34;DepartmentResultMap&#34; type=&#34;Department&#34;&gt;    &lt;id property=&#34;deptId&#34;  column=&#34;dept_id&#34; /&gt;    &lt;result property=&#34;deptName&#34;  column=&#34;dept_name&#34; /&gt;    &lt;collection  property=&#34;employees&#34; ofType=&#34;Employee&#34;&gt;      &lt;id property=&#34;empId&#34;  column=&#34;emp_id&#34; /&gt;      &lt;result  property=&#34;empName&#34; column=&#34;emp_name&#34; /&gt;      &lt;result  property=&#34;empEmail&#34; column=&#34;emp_email&#34; /&gt;    &lt;/collection&gt;  &lt;/resultMap&gt;  这里，collection指定了关联的结果集类型（Employee）以及关联的结果映射。  区别：  association用于一对一的关系，而collection用于一对多的关系。  association关联的结果类型是复杂类型（Java对象），而collection关联的结果类型是集合类型（List、Set等）。  在association中，外键列必须在当前表中存在；而在collection中，外键列可以在当前表或关联表中存在。  association使用的是association标签，而collection使用的是collection标签。&lt;/p&gt;
+&lt;/h4&gt;&lt;p&gt;在MyBatis多表映射中，association和collection是两种不同的映射类型，用于处理关联关系和一对多的关系。&lt;/p&gt;
+&lt;p&gt;association： association用于描述两个表之间的一对一关系。它表示一个复杂类型（Java对象）在另一个表中的外键关联。在映射文件中，我们可以使用association来定义关联关系，指定外键列和关联的结果映射。  例如，假设我们有两个表：Order（订单）和User（用户），一个订单只对应一个用户。我们可以在Order的映射文件中使用association来描述订单和用户之间的关联关系：  &lt;resultMap  id=&#34;OrderResultMap&#34; type=&#34;Order&#34;&gt;    &lt;id property=&#34;orderId&#34;  column=&#34;order_id&#34; /&gt;    &lt;result property=&#34;orderName&#34;  column=&#34;order_name&#34; /&gt;    &lt;association property=&#34;user&#34;  javaType=&#34;User&#34;&gt;      &lt;id property=&#34;userId&#34;  column=&#34;user_id&#34; /&gt;      &lt;result  property=&#34;username&#34; column=&#34;username&#34; /&gt;      &lt;result property=&#34;email&#34;  column=&#34;email&#34; /&gt;    &lt;/association&gt;  &lt;/resultMap&gt;  这里，association指定了外键列order_id以及关联的结果映射User。  collection： collection用于处理一对多的关系，表示一个表中的一条记录关联多个另一个表的记录。在映射文件中，我们可以使用collection来定义一对多的映射关系。  例如，假设我们有两个表：Department（部门）和Employee（员工），一个部门拥有多个员工。我们可以在Department的映射文件中使用collection来描述部门和员工之间的关系：     &lt;resultMap  id=&#34;DepartmentResultMap&#34; type=&#34;Department&#34;&gt;    &lt;id property=&#34;deptId&#34;  column=&#34;dept_id&#34; /&gt;    &lt;result property=&#34;deptName&#34;  column=&#34;dept_name&#34; /&gt;    &lt;collection  property=&#34;employees&#34; ofType=&#34;Employee&#34;&gt;      &lt;id property=&#34;empId&#34;  column=&#34;emp_id&#34; /&gt;      &lt;result  property=&#34;empName&#34; column=&#34;emp_name&#34; /&gt;      &lt;result  property=&#34;empEmail&#34; column=&#34;emp_email&#34; /&gt;    &lt;/collection&gt;  &lt;/resultMap&gt;  这里，collection指定了关联的结果集类型（Employee）以及关联的结果映射。  区别：  association用于一对一的关系，而collection用于一对多的关系。  association关联的结果类型是复杂类型（Java对象），而collection关联的结果类型是集合类型（List、Set等）。  在association中，外键列必须在当前表中存在；而在collection中，外键列可以在当前表或关联表中存在。  association使用的是association标签，而collection使用的是collection标签。&lt;/p&gt;
 &lt;h4 id=&#34;请写出mybatis中常用的动态标签并简单介绍其作用&#34;&gt;请写出Mybatis中常用的动态标签，并简单介绍其作用？
-&lt;/h4&gt;&lt;p&gt;if 标签  if 标签通常用于 WHERE 语句、UPDATE 语句、INSERT 语句中，通过判断参数值来决定是否使用某个查询条件、判断是否更新某一个字段、判断是否插入某个字段的值。  foreach 标签  foreach 标签主要用于构建 in 条件，可在 sql 中对集合进行迭代。也常用到批量删除、添加等操作中。  choose 标签  有时候我们并不想应用所有的条件，而只是想从多个选项中选择一个。MyBatis 提供了 choose 元素，按顺序判断 when 中的条件出否成立，如果有一个成立，则 choose 结束。当 choose 中所有 when的条件都不满则时，则执行 otherwise 中的 sql。类似于 Java 的 switch 语句，choose  为 switch，when 为 case，otherwise 则为  default。  where 标签  当 if 标签较多时,如果标签返回的内容是以 AND 或  OR 开头的，则它会剔除掉.  set 标签  使用 set 标签可以将动态的配置 set关键字，和剔除追加到条件末尾的任何不相关的逗号。  trim 标签  &lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_39623058/article/details/88779301&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+&lt;/h4&gt;&lt;p&gt;if 标签  if 标签通常用于 WHERE 语句、UPDATE 语句、INSERT 语句中，通过判断参数值来决定是否使用某个查询条件、判断是否更新某一个字段、判断是否插入某个字段的值。&lt;/p&gt;
+&lt;p&gt;foreach 标签  foreach 标签主要用于构建 in 条件，可在 sql 中对集合进行迭代。也常用到批量删除、添加等操作中。&lt;/p&gt;
+&lt;p&gt;choose 标签  有时候我们并不想应用所有的条件，而只是想从多个选项中选择一个。MyBatis 提供了 choose 元素，按顺序判断 when 中的条件出否成立，如果有一个成立，则 choose 结束。当 choose 中所有 when的条件都不满则时，则执行 otherwise 中的 sql。类似于 Java 的 switch 语句，choose  为 switch，when 为 case，otherwise 则为  default。&lt;/p&gt;
+&lt;p&gt;where 标签  当 if 标签较多时,如果标签返回的内容是以 AND 或  OR 开头的，则它会剔除掉.  set 标签  使用 set 标签可以将动态的配置 set关键字，和剔除追加到条件末尾的任何不相关的逗号。&lt;/p&gt;
+&lt;p&gt;trim 标签  &lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_39623058/article/details/88779301&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;格式化输出，也可以通过 trim 标签设定或忽略前后缀来实现&lt;/a&gt;.   配置关联关系  collection 标签  配置一对多    association 标签  配置一对一  sql 标签  当多种类型的查询语句的查询字段或者查询条件相同时，可以将其定义为常量，方便调用。为求 &lt;select&gt; 结构清晰也可将 sql 语句分解。&lt;/p&gt;
 &lt;h4 id=&#34;描述下spring-ioc依赖注入有哪些方式ioc和di&#34;&gt;描述下Spring Ioc依赖注入，有哪些方式？(IOC和DI)
-&lt;/h4&gt;&lt;p&gt;构造器依赖注入：构造器依赖注入在容器触发构造器的时候完成，该构造器有一系列的参数，每个参数代表注入的对象。  Setter方法依赖注入：首先容器会触发一个无参构造函数或无参静态工厂方法实例化对象，之后容器调用bean中的setter方法完成Setter方法依赖注入。  全局属性注入：&lt;/p&gt;
+&lt;/h4&gt;&lt;p&gt;构造器依赖注入：构造器依赖注入在容器触发构造器的时候完成，该构造器有一系列的参数，每个参数代表注入的对象。&lt;/p&gt;
+&lt;p&gt;Setter方法依赖注入：首先容器会触发一个无参构造函数或无参静态工厂方法实例化对象，之后容器调用bean中的setter方法完成Setter方法依赖注入。  全局属性注入：&lt;/p&gt;
 &lt;h4 id=&#34;说下对spring面向切面编程aop的理解以及常用术语&#34;&gt;说下对Spring面向切面编程(AOP)的理解？以及常用术语
 &lt;/h4&gt;&lt;ul&gt;
 &lt;li&gt;面向切面编程AOP可以说是OOP（Object Oriented Programming，面向对象编程）的补充和完善。   可以和过滤器进行类比来理解AOP，有很多相似点。  -  OOP解决纵向的业务问题，AOP解决横向的问题，比如日志、安全验证、事务、异常等。   相同的代码重复的出现在项目的不同位置，不利于维护。可以将这些功能分别提取出来，由多份变成一份，   然后在编译或者运行时织入到指定的多个位置。  - Spring底层使用了动态代理模式实现AOP。若目标对象实现了若干接口，Spring 使用JDK的动态代理。   若目标没有实现任何接口，Spring 使用 CGLIB 库生成目标类的子类。还可以配置不管是否实现接口，   都是要CGLIB。  面向切面编程（AOP）：允许程序员模块化横向业务逻辑，或定义核心部分的功能，例如日志管理和事务管理。  切面(Aspect) ：AOP的核心就是切面，它将多个类的通用行为封装为可重用的模块。该模块含有一组API提供 cross-cutting功能。例如,日志模块称为日志的AOP切面。根据需求的不同，一个应用程序可以有若干切面。在Spring AOP中，切面通过带有@Aspect注解的类实现。  通知(Advice)：通知表示在方法执行前后需要执行的动作。实际上它是Spring  AOP框架在程序执行过程中触发的一些代码。Spring切面可以执行一下五种类型的通知:  before(前置通知)：在一个方法之前执行的通知。  after(最终通知)：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。  after-returning(后置通知)：在某连接点正常完成后执行的通知。  after-throwing(异常通知)：在方法抛出异常退出时执行的通知。  around(环绕通知)：在方法调用前后触发的通知。  切入点(Pointcut)：切入点是一个或一组连接点，通知将在这些位置执行。可以通过表达式或匹配的方式指明切入点。  引入：引入允许我们在已有的类上添加新的方法或属性。  目标对象：被一个或者多个切面所通知的对象。它通常是一个代理对象。也被称做被通知（advised）对象。  代理：代理是将通知应用到目标对象后创建的对象。从客户端的角度看，代理对象和目标对象是一样的。有以下几种代理：  BeanNameAutoProxyCreator：bean名称自动代理创建器  DefaultAdvisorAutoProxyCreator：默认通知者自动代理创建器  Metadata  autoproxying：元数据自动代理织入：将切面和其他应用类型或对象连接起来创建一个通知对象的过程。织入可以在编译、加载或运行时完成。&lt;/li&gt;

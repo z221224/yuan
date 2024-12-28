@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次 2、浏览器地址：转发不变，重定向改变 3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据 4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会 5、效率：转发浏览器一次请求效率高，重定向效率低 6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等 2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次\n2、浏览器地址：转发不变，重定向改变\n3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据\n4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会\n5、效率：转发浏览器一次请求效率高，重定向效率低\n6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等\n2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
 <title>JavaWEB和SSM题库</title>
 
 <link rel='canonical' href='https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/'>
 
 <link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="JavaWEB和SSM题库">
-<meta property='og:description' content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次 2、浏览器地址：转发不变，重定向改变 3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据 4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会 5、效率：转发浏览器一次请求效率高，重定向效率低 6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等 2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
+<meta property='og:description' content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次\n2、浏览器地址：转发不变，重定向改变\n3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据\n4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会\n5、效率：转发浏览器一次请求效率高，重定向效率低\n6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等\n2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
 <meta property='og:url' content='https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/'>
 <meta property='og:site_name' content='米 粒'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-01-01T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-01-01T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="JavaWEB和SSM题库">
-<meta name="twitter:description" content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次 2、浏览器地址：转发不变，重定向改变 3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据 4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会 5、效率：转发浏览器一次请求效率高，重定向效率低 6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等 2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
+<meta name="twitter:description" content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次\n2、浏览器地址：转发不变，重定向改变\n3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据\n4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会\n5、效率：转发浏览器一次请求效率高，重定向效率低\n6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等\n2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
     </head>
     <body class="
     article-page
@@ -488,9 +488,15 @@
     
     <h2 id="javaweb部分">JavaWEB部分
 </h2><h3 id="请描述转发和重定向的区别">请描述转发和重定向的区别？
-</h3><p>1、请求次数： 转发一次，重定向两次  2、浏览器地址：转发不变，重定向改变  3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据  4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会  5、效率：转发浏览器一次请求效率高，重定向效率低  6、WEB-INF下资源：转发可以访问，重定向不可以</p>
+</h3><p>1、请求次数： 转发一次，重定向两次</p>
+<p>2、浏览器地址：转发不变，重定向改变</p>
+<p>3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据</p>
+<p>4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会</p>
+<p>5、效率：转发浏览器一次请求效率高，重定向效率低</p>
+<p>6、WEB-INF下资源：转发可以访问，重定向不可以</p>
 <h3 id="和的区别">==和===的区别？
-</h3><p>1、==  只判断值是否相等，不考虑其数据类型是否相等  2、===既判断值相等，又判断数据类型相等</p>
+</h3><p>1、==  只判断值是否相等，不考虑其数据类型是否相等</p>
+<p>2、===既判断值相等，又判断数据类型相等</p>
 <h3 id="http-常见的状态码有哪些">Http 常见的状态码有哪些？
 </h3><p>200 OK //客户端请求成功</p>
 <p>301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置</p>
@@ -696,14 +702,69 @@
 <h4 id="mybatis如何获取自动生成的主键值如何完成mysql的批量操作">MyBatis如何获取自动生成的(主)键值？如何完成MySQL的批量操作
 </h4><p>在<insert>标签中使用 useGeneratedKeys  和 keyProperty 两个属性来获取自动生成的主键值。  例如:              <insert id="insertname"     usegeneratedkeys="true" keyproperty="id">       insert into names (name) values (#{name})     </insert>            MyBatis完成MySQL的批量操作主要是通过<foreache>标签来拼装相应的SQL语句。  例如:              <insert id="insertBatch" >       insert into tbl_employee(last_name,email,gender,d_id) values       <foreach collection="emps" item="curr_emp" separator=",">         (#{curr_emp.lastName},#{curr_emp.email},#{curr_emp.gender},#{curr_emp.dept.id})       </foreach>     </insert></p>
 <h4 id="简述mybatis的单个参数多个参数如何传递及如何取值">简述MyBatis的单个参数、多个参数如何传递及如何取值
-</h4><p>1、MyBatis传递单个参数，如果是普通类型(String+8个基本)的，取值时在#{}中可以任意指定，如果是对象类型的，则在#{}中使用对象的属性名来取值  2、MyBatis传递多个参数，默认情况下，MyBatis会对多个参数进行封装Map. 取值时  在#{}可以使用012 .. 或者是param1 param2..   3、MyBatis传递多个参数，建议使用命名参数，在Mapper接口的方法的形参前面使用  @Param() 来指定封装Map时用的key. 取值时在#{}中使用@Param指定的key.             方法一：顺序传参    public User select(String name,int id);    <select id="select"    resultMap="UserResultMap">    select * from user where name=#{0} and id=#{1}    </select>    #{}里面的数字代表你传入参数的顺序。    这种方法不建议使用，sql层表达不直观，且一旦顺序调整容易出错。    方法二：@Param注解传参    public User select(@Param(&ldquo;paramName&rdquo;) String    name,@Param(&ldquo;paramId&rdquo;) int id);    <select id="select"    resultMap="UserResultMap">    select * from user where name=#{paramName} and id=#{paramId}    </select>    #{}里面的名称对应的是注解 @Param括号里面修饰的名称。    这种方法在参数不多的情况还是比较直观的，推荐使用。    方法三：Map传参    Map&lt;String,Object&gt; map = new HashMap&lt;String, Object&gt;();    map.put(&ldquo;mapName&rdquo;,&ldquo;zhangsan&rdquo;);    map.put(&ldquo;mapId&rdquo;,2);    public User select(Map&lt;String,Object&gt; map);    <select id="select"    parameterType="java.util.Map"    resultMap="UserResultMap">    select * from user where name=#{mapName} and id=#{mapId}    </select>    #{}里面的名称对应的是 Map里面的key名称。    这种方法适合传递多个参数，且参数易变能灵活传递的情况。</p>
+</h4><p>1、MyBatis传递单个参数，如果是普通类型(String+8个基本)的，取值时在#{}中可以任意指定，如果是对象类型的，则在#{}中使用对象的属性名来取值</p>
+<p>2、MyBatis传递多个参数，默认情况下，MyBatis会对多个参数进行封装Map. 取值时  在#{}可以使用012 .. 或者是param1 param2..   3、MyBatis传递多个参数，建议使用命名参数，在Mapper接口的方法的形参前面使用  @Param() 来指定封装Map时用的key. 取值时在#{}中使用@Param指定的key.</p>
+<p>方法一：顺序传参</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">public User select(String name,int id);   
+</span></span><span class="line"><span class="cl"> &lt;select id=&#34;select&#34;    resultMap=&#34;UserResultMap&#34;&gt;    
+</span></span><span class="line"><span class="cl"> 	select * from user where name=#{0} and id=#{1}   
+</span></span><span class="line"><span class="cl"> &lt;/select&gt;    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>#{}里面的数字代表你传入参数的顺序。    这种方法不建议使用，sql层表达不直观，且一旦顺序调整容易出错。</p>
+<p>方法二：@Param注解传参</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">public User select(@Param(&#34;paramName&#34;) String    name,@Param(&#34;paramId&#34;) int id);    
+</span></span><span class="line"><span class="cl">&lt;select id=&#34;select&#34;    resultMap=&#34;UserResultMap&#34;&gt;    
+</span></span><span class="line"><span class="cl">	select * from user where name=#{paramName} and id=#{paramId}  &lt;/select&gt;    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>#{}里面的名称对应的是注解 @Param括号里面修饰的名称。    这种方法在参数不多的情况还是比较直观的，推荐使用。</p>
+<p>方法三：Map传参</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Map&lt;String,Object&gt; map = new HashMap&lt;String, Object&gt;();    map.put(&#34;mapName&#34;,&#34;zhangsan&#34;);    
+</span></span><span class="line"><span class="cl">map.put(&#34;mapId&#34;,2);    
+</span></span><span class="line"><span class="cl">public User select(Map&lt;String,Object&gt; map);    
+</span></span><span class="line"><span class="cl">&lt;select id=&#34;select&#34;    parameterType=&#34;java.util.Map&#34;    resultMap=&#34;UserResultMap&#34;&gt;    
+</span></span><span class="line"><span class="cl">	select * from user where name=#{mapName} and id=#{mapId}    &lt;/select&gt;    
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>#{}里面的名称对应的是 Map里面的key名称。    这种方法适合传递多个参数，且参数易变能灵活传递的情况。</p>
 <h4 id="讲述下mybatis多表映射中association与collection区别">讲述下MyBatis多表映射中association与collection区别
-</h4><p>在MyBatis多表映射中，association和collection是两种不同的映射类型，用于处理关联关系和一对多的关系。  association： association用于描述两个表之间的一对一关系。它表示一个复杂类型（Java对象）在另一个表中的外键关联。在映射文件中，我们可以使用association来定义关联关系，指定外键列和关联的结果映射。  例如，假设我们有两个表：Order（订单）和User（用户），一个订单只对应一个用户。我们可以在Order的映射文件中使用association来描述订单和用户之间的关联关系：  <resultMap  id="OrderResultMap" type="Order">    <id property="orderId"  column="order_id" />    <result property="orderName"  column="order_name" />    <association property="user"  javaType="User">      <id property="userId"  column="user_id" />      <result  property="username" column="username" />      <result property="email"  column="email" />    </association>  </resultMap>  这里，association指定了外键列order_id以及关联的结果映射User。  collection： collection用于处理一对多的关系，表示一个表中的一条记录关联多个另一个表的记录。在映射文件中，我们可以使用collection来定义一对多的映射关系。  例如，假设我们有两个表：Department（部门）和Employee（员工），一个部门拥有多个员工。我们可以在Department的映射文件中使用collection来描述部门和员工之间的关系：     <resultMap  id="DepartmentResultMap" type="Department">    <id property="deptId"  column="dept_id" />    <result property="deptName"  column="dept_name" />    <collection  property="employees" ofType="Employee">      <id property="empId"  column="emp_id" />      <result  property="empName" column="emp_name" />      <result  property="empEmail" column="emp_email" />    </collection>  </resultMap>  这里，collection指定了关联的结果集类型（Employee）以及关联的结果映射。  区别：  association用于一对一的关系，而collection用于一对多的关系。  association关联的结果类型是复杂类型（Java对象），而collection关联的结果类型是集合类型（List、Set等）。  在association中，外键列必须在当前表中存在；而在collection中，外键列可以在当前表或关联表中存在。  association使用的是association标签，而collection使用的是collection标签。</p>
+</h4><p>在MyBatis多表映射中，association和collection是两种不同的映射类型，用于处理关联关系和一对多的关系。</p>
+<p>association： association用于描述两个表之间的一对一关系。它表示一个复杂类型（Java对象）在另一个表中的外键关联。在映射文件中，我们可以使用association来定义关联关系，指定外键列和关联的结果映射。  例如，假设我们有两个表：Order（订单）和User（用户），一个订单只对应一个用户。我们可以在Order的映射文件中使用association来描述订单和用户之间的关联关系：  <resultMap  id="OrderResultMap" type="Order">    <id property="orderId"  column="order_id" />    <result property="orderName"  column="order_name" />    <association property="user"  javaType="User">      <id property="userId"  column="user_id" />      <result  property="username" column="username" />      <result property="email"  column="email" />    </association>  </resultMap>  这里，association指定了外键列order_id以及关联的结果映射User。  collection： collection用于处理一对多的关系，表示一个表中的一条记录关联多个另一个表的记录。在映射文件中，我们可以使用collection来定义一对多的映射关系。  例如，假设我们有两个表：Department（部门）和Employee（员工），一个部门拥有多个员工。我们可以在Department的映射文件中使用collection来描述部门和员工之间的关系：     <resultMap  id="DepartmentResultMap" type="Department">    <id property="deptId"  column="dept_id" />    <result property="deptName"  column="dept_name" />    <collection  property="employees" ofType="Employee">      <id property="empId"  column="emp_id" />      <result  property="empName" column="emp_name" />      <result  property="empEmail" column="emp_email" />    </collection>  </resultMap>  这里，collection指定了关联的结果集类型（Employee）以及关联的结果映射。  区别：  association用于一对一的关系，而collection用于一对多的关系。  association关联的结果类型是复杂类型（Java对象），而collection关联的结果类型是集合类型（List、Set等）。  在association中，外键列必须在当前表中存在；而在collection中，外键列可以在当前表或关联表中存在。  association使用的是association标签，而collection使用的是collection标签。</p>
 <h4 id="请写出mybatis中常用的动态标签并简单介绍其作用">请写出Mybatis中常用的动态标签，并简单介绍其作用？
-</h4><p>if 标签  if 标签通常用于 WHERE 语句、UPDATE 语句、INSERT 语句中，通过判断参数值来决定是否使用某个查询条件、判断是否更新某一个字段、判断是否插入某个字段的值。  foreach 标签  foreach 标签主要用于构建 in 条件，可在 sql 中对集合进行迭代。也常用到批量删除、添加等操作中。  choose 标签  有时候我们并不想应用所有的条件，而只是想从多个选项中选择一个。MyBatis 提供了 choose 元素，按顺序判断 when 中的条件出否成立，如果有一个成立，则 choose 结束。当 choose 中所有 when的条件都不满则时，则执行 otherwise 中的 sql。类似于 Java 的 switch 语句，choose  为 switch，when 为 case，otherwise 则为  default。  where 标签  当 if 标签较多时,如果标签返回的内容是以 AND 或  OR 开头的，则它会剔除掉.  set 标签  使用 set 标签可以将动态的配置 set关键字，和剔除追加到条件末尾的任何不相关的逗号。  trim 标签  <a class="link" href="https://blog.csdn.net/qq_39623058/article/details/88779301"  target="_blank" rel="noopener"
+</h4><p>if 标签  if 标签通常用于 WHERE 语句、UPDATE 语句、INSERT 语句中，通过判断参数值来决定是否使用某个查询条件、判断是否更新某一个字段、判断是否插入某个字段的值。</p>
+<p>foreach 标签  foreach 标签主要用于构建 in 条件，可在 sql 中对集合进行迭代。也常用到批量删除、添加等操作中。</p>
+<p>choose 标签  有时候我们并不想应用所有的条件，而只是想从多个选项中选择一个。MyBatis 提供了 choose 元素，按顺序判断 when 中的条件出否成立，如果有一个成立，则 choose 结束。当 choose 中所有 when的条件都不满则时，则执行 otherwise 中的 sql。类似于 Java 的 switch 语句，choose  为 switch，when 为 case，otherwise 则为  default。</p>
+<p>where 标签  当 if 标签较多时,如果标签返回的内容是以 AND 或  OR 开头的，则它会剔除掉.  set 标签  使用 set 标签可以将动态的配置 set关键字，和剔除追加到条件末尾的任何不相关的逗号。</p>
+<p>trim 标签  <a class="link" href="https://blog.csdn.net/qq_39623058/article/details/88779301"  target="_blank" rel="noopener"
     >格式化输出，也可以通过 trim 标签设定或忽略前后缀来实现</a>.   配置关联关系  collection 标签  配置一对多    association 标签  配置一对一  sql 标签  当多种类型的查询语句的查询字段或者查询条件相同时，可以将其定义为常量，方便调用。为求 <select> 结构清晰也可将 sql 语句分解。</p>
 <h4 id="描述下spring-ioc依赖注入有哪些方式ioc和di">描述下Spring Ioc依赖注入，有哪些方式？(IOC和DI)
-</h4><p>构造器依赖注入：构造器依赖注入在容器触发构造器的时候完成，该构造器有一系列的参数，每个参数代表注入的对象。  Setter方法依赖注入：首先容器会触发一个无参构造函数或无参静态工厂方法实例化对象，之后容器调用bean中的setter方法完成Setter方法依赖注入。  全局属性注入：</p>
+</h4><p>构造器依赖注入：构造器依赖注入在容器触发构造器的时候完成，该构造器有一系列的参数，每个参数代表注入的对象。</p>
+<p>Setter方法依赖注入：首先容器会触发一个无参构造函数或无参静态工厂方法实例化对象，之后容器调用bean中的setter方法完成Setter方法依赖注入。  全局属性注入：</p>
 <h4 id="说下对spring面向切面编程aop的理解以及常用术语">说下对Spring面向切面编程(AOP)的理解？以及常用术语
 </h4><ul>
 <li>面向切面编程AOP可以说是OOP（Object Oriented Programming，面向对象编程）的补充和完善。   可以和过滤器进行类比来理解AOP，有很多相似点。  -  OOP解决纵向的业务问题，AOP解决横向的问题，比如日志、安全验证、事务、异常等。   相同的代码重复的出现在项目的不同位置，不利于维护。可以将这些功能分别提取出来，由多份变成一份，   然后在编译或者运行时织入到指定的多个位置。  - Spring底层使用了动态代理模式实现AOP。若目标对象实现了若干接口，Spring 使用JDK的动态代理。   若目标没有实现任何接口，Spring 使用 CGLIB 库生成目标类的子类。还可以配置不管是否实现接口，   都是要CGLIB。  面向切面编程（AOP）：允许程序员模块化横向业务逻辑，或定义核心部分的功能，例如日志管理和事务管理。  切面(Aspect) ：AOP的核心就是切面，它将多个类的通用行为封装为可重用的模块。该模块含有一组API提供 cross-cutting功能。例如,日志模块称为日志的AOP切面。根据需求的不同，一个应用程序可以有若干切面。在Spring AOP中，切面通过带有@Aspect注解的类实现。  通知(Advice)：通知表示在方法执行前后需要执行的动作。实际上它是Spring  AOP框架在程序执行过程中触发的一些代码。Spring切面可以执行一下五种类型的通知:  before(前置通知)：在一个方法之前执行的通知。  after(最终通知)：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。  after-returning(后置通知)：在某连接点正常完成后执行的通知。  after-throwing(异常通知)：在方法抛出异常退出时执行的通知。  around(环绕通知)：在方法调用前后触发的通知。  切入点(Pointcut)：切入点是一个或一组连接点，通知将在这些位置执行。可以通过表达式或匹配的方式指明切入点。  引入：引入允许我们在已有的类上添加新的方法或属性。  目标对象：被一个或者多个切面所通知的对象。它通常是一个代理对象。也被称做被通知（advised）对象。  代理：代理是将通知应用到目标对象后创建的对象。从客户端的角度看，代理对象和目标对象是一样的。有以下几种代理：  BeanNameAutoProxyCreator：bean名称自动代理创建器  DefaultAdvisorAutoProxyCreator：默认通知者自动代理创建器  Metadata  autoproxying：元数据自动代理织入：将切面和其他应用类型或对象连接起来创建一个通知对象的过程。织入可以在编译、加载或运行时完成。</li>
