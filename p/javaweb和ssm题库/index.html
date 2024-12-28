@@ -10,7 +10,7 @@
 <meta property='og:description' content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次 2、浏览器地址：转发不变，重定向改变 3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据 4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会 5、效率：转发浏览器一次请求效率高，重定向效率低 6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等 2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
 <meta property='og:url' content='https://z221224.github.io/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/'>
 <meta property='og:site_name' content='米 粒'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2024-01-01T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2024-01-01T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="JavaWEB和SSM题库">
 <meta name="twitter:description" content="JavaWEB部分\r请描述转发和重定向的区别？\r1、请求次数： 转发一次，重定向两次 2、浏览器地址：转发不变，重定向改变 3、使用request域共享数据：转发是一次请求可以共享数据，重定向浏览器发起两次请求，不能共享数据 4、相对路径： 转发地址不变会造成转发后的页面中的相对位置发生改变引起相对路径失效，重定向不会 5、效率：转发浏览器一次请求效率高，重定向效率低 6、WEB-INF下资源：转发可以访问，重定向不可以\n==和===的区别？\r1、== 只判断值是否相等，不考虑其数据类型是否相等 2、===既判断值相等，又判断数据类型相等\nHttp 常见的状态码有哪些？\r200 OK //客户端请求成功\n301 Moved Permanently（永久移除)，请求的 URL 已移走。Response 中应该包含一个 Location URL, 说明资源现在所处的位置\n302 found 重定向\n400 Bad Request //客户端请求有语法错误，不能被服务器所理解\n401 Unauthorized //请求未经授权，这个状态代码必须和 WWW-Authenticate 报头域一起使用\n403 Forbidden //服务器收到请求，但是拒绝提供服务\n404 Not Found //请求资源不存在，eg：输入了错误的 URL\n500 Internal Server Error //服务器发生不可预期的错误\n503 Server Unavailable //服务器当前不能处理客户端的请求，一段时间后可能恢复正常\nServlet生命周期\rServlet 加载—&gt;实例化—&gt;服务—&gt;销毁。\n生命周期详解：\ninit（）：\n在Servlet的生命周期中，仅执行一次init()方法。它是在服务器装入Servlet时执行的，负责初始化Servlet对象。可以配置服务器，以在启动服务器或客户机首次访问Servlet时装入Servlet。无论有多少客户机访问Servlet，都不会重复执行init（）。\nservice（）：\n它是Servlet的核心，负责响应客户的请求。每当一个客户请求一个HttpServlet对象，该对象的Service()方法就要调用，而且传递给这个方法一个“请求”（ServletRequest）对象和一个“响应”（ServletResponse）对象作为参数。在HttpServlet中已存在Service()方法。默认的服务功能是调用与HTTP请求的方法相应的do功能。\ndestroy（）：\n仅执行一次，在服务器端停止且卸载Servlet时执行该方法。当Servlet对象退出生命周期时，负责释放占用的资源。一个Servlet在运行service()方法时可能会产生其他的线程，因此需要确认在调用destroy()方法时，这些线程已经终止或完成。\n如何与Tomcat 结合工作步骤：\n（1）Web Client 向Servlet容器（Tomcat）发出Http请求\n">
     </head>
@@ -445,6 +445,19 @@
     
     
     <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2024-01-01</time>
+            </div>
         
 
         
