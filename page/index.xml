@@ -7,20 +7,29 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>米饭能吃饱</copyright>
-        <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/page/index.xml" rel="self" type="application/rss+xml" /><item>
-        <title>Archives</title>
+        <lastBuildDate>Tue, 24 Dec 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>归档</title>
         <link>https://z221224.github.io/yuan/archives/</link>
-        <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
+        <pubDate>Tue, 24 Dec 2024 00:00:00 +0000</pubDate>
         
         <guid>https://z221224.github.io/yuan/archives/</guid>
         <description></description>
         </item>
         <item>
-        <title>Links</title>
-        <link>https://z221224.github.io/yuan/links/</link>
+        <title>关于</title>
+        <link>https://z221224.github.io/yuan/%E5%85%B3%E4%BA%8E/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://z221224.github.io/yuan/links/</guid>
+        <guid>https://z221224.github.io/yuan/%E5%85%B3%E4%BA%8E/</guid>
+        <description>&lt;p&gt;This is a test page for i18n support.&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>链接</title>
+        <link>https://z221224.github.io/yuan/%E9%93%BE%E6%8E%A5/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/%E9%93%BE%E6%8E%A5/</guid>
         <description>&lt;p&gt;To use this feature, add &lt;code&gt;links&lt;/code&gt; section to frontmatter.&lt;/p&gt;
 &lt;p&gt;This page&amp;rsquo;s frontmatter:&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
@@ -51,21 +60,12 @@
 </description>
         </item>
         <item>
-        <title>Search</title>
+        <title>搜索</title>
         <link>https://z221224.github.io/yuan/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
         <guid>https://z221224.github.io/yuan/search/</guid>
         <description></description>
-        </item>
-        <item>
-        <title>关于</title>
-        <link>https://z221224.github.io/yuan/%E5%85%B3%E4%BA%8E/</link>
-        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-        
-        <guid>https://z221224.github.io/yuan/%E5%85%B3%E4%BA%8E/</guid>
-        <description>&lt;p&gt;This is a test page for i18n support.&lt;/p&gt;
-</description>
         </item>
         
     </channel>
