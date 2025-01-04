@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Java并发编程（多线程）\r创建多线程的四种方式\rJava中使用Thread类代表线程，所以不管使用什么方式创建多线程本质上都是创建新的Thread对象，然后再调用start()方法启动线程\n所不同的是：打算放在新线程中要执行的任务如何封装\n继承Thread类\r定义一个类继承自 Thread 类，并重写 run() 方法。 创建该类的对象，并调用其 start() 方法启动新线程。 实现Runnable接口\r定义一个类并实现 Runnable 接口的 run() 方法。 创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。 调用 Thread 实例的 start() 方法启动新线程。 实现Callable接口（需借助FutureTask）\r定义一个类并实现 Callable 接口的 call() 方法。 创建一个 FutureTask 对象，将 Callable 实例作为参数传入。 将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。 通过 FutureTask 对象的 get() 方法获取异步计算的结果。 使用线程池\r创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。 提交实现了 Runnable 或 Callable 接口的任务到执行器服务。 执行器服务会自动分配线程来执行这些任务。 多线程生命周期\r背记\r新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。 就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。 运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。 阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。 等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。 计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。 终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。 线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。\n">
+<title>线程池</title>
+
+<link rel='canonical' href='https://z221224.github.io/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/'>
+
+<link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="线程池">
+<meta property='og:description' content="Java并发编程（多线程）\r创建多线程的四种方式\rJava中使用Thread类代表线程，所以不管使用什么方式创建多线程本质上都是创建新的Thread对象，然后再调用start()方法启动线程\n所不同的是：打算放在新线程中要执行的任务如何封装\n继承Thread类\r定义一个类继承自 Thread 类，并重写 run() 方法。 创建该类的对象，并调用其 start() 方法启动新线程。 实现Runnable接口\r定义一个类并实现 Runnable 接口的 run() 方法。 创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。 调用 Thread 实例的 start() 方法启动新线程。 实现Callable接口（需借助FutureTask）\r定义一个类并实现 Callable 接口的 call() 方法。 创建一个 FutureTask 对象，将 Callable 实例作为参数传入。 将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。 通过 FutureTask 对象的 get() 方法获取异步计算的结果。 使用线程池\r创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。 提交实现了 Runnable 或 Callable 接口的任务到执行器服务。 执行器服务会自动分配线程来执行这些任务。 多线程生命周期\r背记\r新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。 就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。 运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。 阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。 等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。 计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。 终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。 线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。\n">
+<meta property='og:url' content='https://z221224.github.io/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/'>
+<meta property='og:site_name' content='米 粒'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' />
+<meta name="twitter:title" content="线程池">
+<meta name="twitter:description" content="Java并发编程（多线程）\r创建多线程的四种方式\rJava中使用Thread类代表线程，所以不管使用什么方式创建多线程本质上都是创建新的Thread对象，然后再调用start()方法启动线程\n所不同的是：打算放在新线程中要执行的任务如何封装\n继承Thread类\r定义一个类继承自 Thread 类，并重写 run() 方法。 创建该类的对象，并调用其 start() 方法启动新线程。 实现Runnable接口\r定义一个类并实现 Runnable 接口的 run() 方法。 创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。 调用 Thread 实例的 start() 方法启动新线程。 实现Callable接口（需借助FutureTask）\r定义一个类并实现 Callable 接口的 call() 方法。 创建一个 FutureTask 对象，将 Callable 实例作为参数传入。 将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。 通过 FutureTask 对象的 get() 方法获取异步计算的结果。 使用线程池\r创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。 提交实现了 Runnable 或 Callable 接口的任务到执行器服务。 执行器服务会自动分配线程来执行这些任务。 多线程生命周期\r背记\r新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。 就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。 运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。 阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。 等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。 计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。 终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。 线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/yuan/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/yuan/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🕸️</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/yuan">米 粒</a></h1>
+            <h2 class="site-description">你感到痛苦，是因为你在成长</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://www.bilibili.com/'
+                        target="_blank"
+                        title="bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/z221224'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/yuan/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#java并发编程多线程">Java并发编程（多线程）</a>
+      <ol>
+        <li><a href="#创建多线程的四种方式">创建多线程的四种方式</a>
+          <ol>
+            <li><a href="#继承thread类">继承Thread类</a></li>
+            <li><a href="#实现runnable接口">实现Runnable接口</a></li>
+            <li><a href="#实现callable接口需借助futuretask">实现Callable接口（需借助FutureTask）</a></li>
+            <li><a href="#使用线程池">使用线程池</a></li>
+          </ol>
+        </li>
+        <li><a href="#多线程生命周期">多线程生命周期</a>
+          <ol>
+            <li><a href="#背记">背记</a></li>
+            <li><a href="#理解">理解</a></li>
+          </ol>
+        </li>
+        <li><a href="#什么是线程池线程池有哪些">什么是线程池，线程池有哪些？</a></li>
+        <li><a href="#threadpoolexecutor对象有哪些参数都有什么作用怎么设定核心线程数和最大线程数拒绝策略有哪些-重点">ThreadPoolExecutor对象有哪些参数？都有什么作用？怎么设定核心线程数和最大线程数？拒绝策略有哪些？ [重点]</a>
+          <ol>
+            <li><a href="#7个参数的作用">7个参数的作用</a></li>
+            <li><a href="#线程池大小设置">线程池大小设置</a></li>
+          </ol>
+        </li>
+        <li><a href="#常见线程安全的并发容器有哪些">常见线程安全的并发容器有哪些？</a></li>
+        <li><a href="#atomic原子类了解多少原理是什么">Atomic原子类了解多少？原理是什么？</a>
+          <ol>
+            <li><a href="#概述">概述</a></li>
+            <li><a href="#分别说明">分别说明</a></li>
+          </ol>
+        </li>
+        <li><a href="#synchronized底层实现是什么lock底层是什么有什么区别">synchronized底层实现是什么？Lock底层是什么？有什么区别？</a>
+          <ol>
+            <li><a href="#71-synchronized原理">7.1 synchronized原理</a></li>
+            <li><a href="#lock原理">Lock原理</a></li>
+            <li><a href="#lock与synchronized的区别">Lock与synchronized的区别</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/yuan/categories/%E9%A2%98%E5%BA%93/" >
+                题库
+            </a>
+        
+            <a href="/yuan/categories/java/" >
+                Java
+            </a>
+        
+            <a href="/yuan/categories/%E7%BA%BF%E7%A8%8B%E6%B1%A0/" >
+                线程池
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">线程池</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 3 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="java并发编程多线程">Java并发编程（多线程）
+</h2><h3 id="创建多线程的四种方式">创建多线程的四种方式
+</h3><p>Java中使用Thread类代表线程，所以不管使用什么方式创建多线程<strong>本质</strong>上都是创建新的<strong>Thread对象</strong>，然后再调用start()方法启动线程</p>
+<p>所不同的是：打算放在新线程中要执行的<strong>任务</strong>如何<strong>封装</strong></p>
+<h4 id="继承thread类">继承Thread类
+</h4><ul>
+<li>定义一个类继承自 Thread 类，并重写 run() 方法。</li>
+<li>创建该类的对象，并调用其 start() 方法启动新线程。</li>
+</ul>
+<h4 id="实现runnable接口">实现Runnable接口
+</h4><ul>
+<li>定义一个类并实现 Runnable 接口的 run() 方法。</li>
+<li>创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。</li>
+<li>调用 Thread 实例的 start() 方法启动新线程。</li>
+</ul>
+<h4 id="实现callable接口需借助futuretask">实现Callable接口（需借助FutureTask）
+</h4><ul>
+<li>定义一个类并实现 Callable 接口的 call() 方法。</li>
+<li>创建一个 FutureTask 对象，将 Callable 实例作为参数传入。</li>
+<li>将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。</li>
+<li>通过 FutureTask 对象的 get() 方法获取异步计算的结果。</li>
+</ul>
+<h4 id="使用线程池">使用线程池
+</h4><ul>
+<li>创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。</li>
+<li>提交实现了 Runnable 或 Callable 接口的任务到执行器服务。</li>
+<li>执行器服务会自动分配线程来执行这些任务。</li>
+</ul>
+<h3 id="多线程生命周期">多线程生命周期
+</h3><h4 id="背记">背记
+</h4><ul>
+<li>新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。</li>
+<li>就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。</li>
+<li>运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。</li>
+<li>阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。</li>
+<li>等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。</li>
+<li>计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。</li>
+<li>终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。</li>
+</ul>
+<p>线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。</p>
+<p>在Java中，可以通过Thread类提供的方法来控制和管理线程的状态，例如使用interrupt()方法来中断线程的阻塞状态，或者使用join()方法等待线程终止等</p>
+<h4 id="理解">理解
+</h4><h5 id="源码中定义的线程状态">源码中定义的线程状态
+</h5><p>State</p>
+<h6 id="新建new-">新建（NEW ）
+</h6><p>线程对象刚刚创建，但未启动（start）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">();</span><span class="c1">// 只要线程new出来</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;线程的名字&#34;</span><span class="o">+</span><span class="n">thread</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="o">+</span><span class="s">&#34;线程的状态:&#34;</span><span class="o">+</span><span class="n">thread</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h6 id="可运行runnable-">可运行（RUNNABLE ）
+</h6><p>线程已被启动，可以被调度或正在被调度；也可以说此时线程在等待CPU时间片</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="o">-&gt;</span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;1111&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;线程的状态&#34;</span><span class="o">+</span><span class="n">Thread</span><span class="p">.</span><span class="na">currentThread</span><span class="p">().</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">thread</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;线程的状态&#34;</span><span class="o">+</span><span class="n">thread</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h6 id="锁阻塞blocked-">锁阻塞（BLOCKED ）
+</h6><p>当前线程要获取的锁对象正在被其他线程占用，此时该线程处于Blocked状态</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="w"> </span><span class="n">threadA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;11111&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">1000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">},</span><span class="w"> </span><span class="s">&#34;A&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">threadA</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">500</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="w"> </span><span class="n">threadB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">},</span><span class="w"> </span><span class="s">&#34;B&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">threadB</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">100</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;线程&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">threadB</span><span class="p">.</span><span class="na">getName</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;状态&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">threadB</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h6 id="等待阻塞waiting-">等待阻塞（WAITING ）
+</h6><p>当前线程遇到了wait()，join()等方法</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">1</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">10</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;i---&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">i</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">5</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">o</span><span class="p">.</span><span class="na">wait</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="c1">// 使用对象的wait方法时 必要要有一个对象和synchronized</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="c1">// 如若不结合synchronized 那么就会出现一个监视器对象状态异常 IllegalMonitorStateException。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="c1">// 任何一个对象中都有一个ObjectMonitor对象。监视器锁。管程技术。</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">thread</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">2000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">thread</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="w"> </span><span class="n">thread1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c1">// o.notify();//使用notify或者notifyAll()都要结合synchronized使用，不然就会出现监视器异常IllegalMonitorStateException</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;do some thing&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">o</span><span class="p">.</span><span class="na">notify</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">thread1</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&#34;end&#34;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h6 id="限时等待timed_waiting-">限时等待（TIMED_WAITING ）
+</h6><p>当前线程调用了sleep(时间)，wait(时间)，join(时间)等方法.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="n">Object</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Object</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="w"> </span><span class="n">thread</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Thread</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">o</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// 线程调用wait(5000)方法</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">o</span><span class="p">.</span><span class="na">wait</span><span class="p">(</span><span class="n">5000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">InterruptedException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="n">e</span><span class="p">.</span><span class="na">printStackTrace</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">thread</span><span class="p">.</span><span class="na">start</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 线程调用sleep(5000)方法</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">Thread</span><span class="p">.</span><span class="na">sleep</span><span class="p">(</span><span class="n">5000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">// 线程调用join(5000)方法</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">thread</span><span class="p">.</span><span class="na">join</span><span class="p">(</span><span class="n">5000</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="n">thread</span><span class="p">.</span><span class="na">getState</span><span class="p">());</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h6 id="终止terminated-">终止（TERMINATED ）
+</h6><p>线程正常结束或异常提前退出.</p>
+<h3 id="什么是线程池线程池有哪些">什么是线程池，线程池有哪些？
+</h3><p>线程池就是事先将多个线程对象放到一个容器中，当使用的时候就不用 new 线程而是直接去池中拿线程即可，节省了开辟子线程的时间、实现了线程对象的复用，提高的代码执行效率</p>
+<p>在 JDK 的 java.util.concurrent.Executors 中提供了多种生成线程池的静态方法。</p>
+<ul>
+<li>ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();</li>
+<li>ExecutorService newFixedThreadPool = Executors.newFixedThreadPool(4);</li>
+<li>ScheduledExecutorService newScheduledThreadPool = Executors.newScheduledThreadPool(4);</li>
+<li>ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();</li>
+</ul>
+<p>需要由线程对象执行特定任务时，调用他们的 execute 方法即可。</p>
+<p><strong>注意</strong>：实际开发时严格<strong>禁止使用</strong>上述方法创建线程池！！！因为它们内部设置的各项参数非常不合理，存在OOM等重大风险</p>
+<h3 id="threadpoolexecutor对象有哪些参数都有什么作用怎么设定核心线程数和最大线程数拒绝策略有哪些-重点">ThreadPoolExecutor对象有哪些参数？都有什么作用？怎么设定核心线程数和最大线程数？拒绝策略有哪些？ [重点]
+</h3><h4 id="7个参数的作用">7个参数的作用
+</h4><h5 id="corepoolsize">corePoolSize
+</h5><p>核心线程数，在ThreadPoolExecutor中有一个与它相关的配置：allowCoreThreadTimeOut（默认为false）</p>
+<ul>
+<li>allowCoreThreadTimeOut为false：核心线程会一直存活，哪怕是一直空闲着</li>
+<li>allowCoreThreadTimeOut为true：核心线程空闲时间超过keepAliveTime时会被回收</li>
+</ul>
+<h5 id="maximumpoolsize">maximumPoolSize
+</h5><p>最大线程数，线程池能容纳的最大线程数，当线程池中的线程达到最大且等待队列已满时，添加新任务将会触发拒绝策略</p>
+<h5 id="keepalivetime">keepAliveTime
+</h5><p>线程的最大空闲时间</p>
+<ul>
+<li>非核心空闲超过这个时间将被回收</li>
+<li>核心线程超过这个时间是否回收受allowCoreThreadTimeOut影响</li>
+</ul>
+<h5 id="unit">unit
+</h5><p>keepAliveTime的时间单位</p>
+<h5 id="workqueue">workQueue
+</h5><p>任务队列，常用有三种队列，即SynchronousQueue、LinkedBlockingDeque（无界队列）,ArrayBlockingQueue（有界队列）。</p>
+<h5 id="threadfactory">threadFactory
+</h5><p>线程工厂，ThreadFactory是一个接口，用来创建worker。通过线程工厂可以对线程的一些属性进行定制，默认直接新建线程。</p>
+<h5 id="rejectedexecutionhandler">RejectedExecutionHandler
+</h5><p>也是一个接口，只有一个方法，当线程池中的资源已经全部使用，添加新线程被拒绝时，会调用RejectedExecutionHandler的rejectedExecution法。默认是抛出一个运行时异常。</p>
+<h4 id="线程池大小设置">线程池大小设置
+</h4><h5 id="最佳实践">最佳实践
+</h5><p>把corePoolSize和maximumPoolSize设置成相同的数值，避免非核心线程创建又销毁，销毁又创建</p>
+<h5 id="具体数值设置">具体数值设置
+</h5><p>首先需要分析项目中线程池负责的任务是哪种类型</p>
+<h6 id="cpu密集型">CPU密集型
+</h6><p>主要执行计算任务，响应时间很快，CPU一直在运行。这种任务的CPU利用率很高，那么线程数的配置应该根据CPU核心数来决定。</p>
+<p>CPU核心数等于最大同时执行线程数</p>
+<p>假如CPU核心数为4，那么服务器最多能同时执行4个线程，过多的线程会导致上下文切换反而使得效率降低</p>
+<p>此时线程池的最大线程数可以配置为CPU核心数+1</p>
+<h6 id="io密集型">I/O密集型
+</h6><p>主要进行I/O操作，执行I/O操作时间长，在I/O过程中CPU处于空闲状态导致CPU利用率不高</p>
+<p>这种情况可以增加线程池中线程数量的大小，具体增加多少可以结合线程的等待时长来判断，等待时间越长，线程数可以相对越多</p>
+<p>一般可以配置CPU核心数的两倍</p>
+<blockquote>
+<p>补充：其实我们平时写的常规业务都是I/O密集型。前端发送过来一个请求，Java代码需要计算的不多，大部分时间是在等待Redis、MySQL、ElasticSearch通过网络传输返回结果</p>
+</blockquote>
+<h3 id="常见线程安全的并发容器有哪些">常见线程安全的并发容器有哪些？
+</h3><ul>
+<li>Set集合：<code>CopyOnWriteArraySet</code>（写时复制技术）</li>
+<li>List集合：<code>CopyOnWriteArraySet</code>（写时复制技术）</li>
+<li>Map集合：<code>ConcurrentHashMap</code>
+<ul>
+<li>JDK1.7：采用了锁分段（Segment）技术来提高并发性能，每个段（Segment）相当于一个独立的哈希表，并且每个段都有自己的锁，这样可以减少锁的竞争</li>
+<li>JDK1.8：设计进行了优化，不再使用分段锁（Segment），而是采用了CAS（Compare and Swap）操作和synchronized关键字相结合的方式来实现线程安全，它使用了更细粒度的锁机制，即在链表或红黑树的节点上使用synchronized锁，同时对于一些非竞争性的操作则采用CAS来保证原子性，从而进一步提高了并发性能</li>
+</ul>
+</li>
+</ul>
+<h3 id="atomic原子类了解多少原理是什么">Atomic原子类了解多少？原理是什么？
+</h3><h4 id="概述">概述
+</h4><p>Java中的java.util.concurrent.atomic包提供了一组原子类，用于在多线程环境中执行原子操作，而无需使用显式的锁。</p>
+<h4 id="分别说明">分别说明
+</h4><h5 id="atomicintegeratomiclongatomicreference">AtomicInteger、AtomicLong、AtomicReference
+</h5><p>这些类使用compareAndSet（CAS）操作实现原子性。</p>
+<p>CAS是一种乐观锁定机制，它尝试原子地将一个值更新为新值，但只有在当前值等于预期值时才成功；否则，它会重新尝试。</p>
+<p>CAS操作是由处理器提供的原子性操作指令支持的。</p>
+<h5 id="atomicboolean">AtomicBoolean
+</h5><p>AtomicBoolean类使用compareAndSet实现。</p>
+<p>compareAndSet的实现通常依赖于底层处理器的CAS指令。</p>
+<h5 id="atomicintegerarrayatomiclongarrayatomicreferencearray">AtomicIntegerArray、AtomicLongArray、AtomicReferenceArray
+</h5><p>这些类提供了对数组元素的原子性访问。</p>
+<p>它们也使用CAS操作，但应用于数组的特定位置。</p>
+<h5 id="atomicintegerfieldupdateratomiclongfieldupdateratomicreferencefieldupdater">AtomicIntegerFieldUpdater、AtomicLongFieldUpdater、AtomicReferenceFieldUpdater
+</h5><p>这些类提供了对对象字段的原子性更新。</p>
+<p>它们使用了反射和CAS操作来实现。</p>
+<h3 id="synchronized底层实现是什么lock底层是什么有什么区别">synchronized底层实现是什么？Lock底层是什么？有什么区别？
+</h3><h4 id="71-synchronized原理">7.1 synchronized原理
+</h4><h5 id="同步方法">同步方法
+</h5><p>方法级的同步是隐式的，即无需通过字节码指令来控制，它实现在方法调用和返回操作之中。</p>
+<p>JVM可以从方法常量池中的方法表结构（method_info Structure）中的 ACC_SYNCHRONIZED 访问标志区分一个方法是否同步方法。</p>
+<p>当方法调用时，调用指令将会 检查方法的 ACC_SYNCHRONIZED 访问标志是否被设置，如果设置了，执行线程将先持有monitor（虚拟机规范中用的是管程一词）， 然后再执行方法，最后再方法完成（无论是正常完成还是非正常完成）时释放monitor。</p>
+<h5 id="同步代码块">同步代码块
+</h5><p>代码块的同步是利用monitorenter和monitorexit这两个字节码指令。它们分别位于同步代码块的开始和结束位置。</p>
+<p>当JVM执行到monitorenter指令时，当前线程试图获取monitor对象的所有权，如果未加锁或者已经被当前线程所持有，就把锁的计数器+1；</p>
+<p>当执行monitorexit指令时，锁计数器-1；</p>
+<p>当锁计数器为0时，该锁就被释放了。</p>
+<p>如果获取monitor对象失败，该线程则会进入阻塞状态，直到其他线程释放锁。</p>
+<h4 id="lock原理">Lock原理
+</h4><p>Lock的存储结构：一个int类型状态值（用于锁的状态变更），一个双向链表（用于存储等待中的线程）</p>
+<h5 id="lock获取锁的过程">Lock获取锁的过程
+</h5><p>本质上是通过CAS来获取状态值修改，如果当场没获取到，会将该线程放在线程等待链表中。</p>
+<h5 id="lock释放锁的过程">Lock释放锁的过程
+</h5><p>修改状态值，调整等待链表。Lock大量使用CAS+自旋。因此根据CAS特性，Lock建议使用在低锁冲突的情况下。</p>
+<h4 id="lock与synchronized的区别">Lock与synchronized的区别
+</h4><p>Lock的加锁和解锁都是由Java代码配合native方法（调用操作系统的相关方法）实现的，而synchronized的加锁和解锁的过程是由JVM管理的。</p>
+<h5 id="阻塞机制">阻塞机制
+</h5><ul>
+<li>当一个线程使用synchronized获取锁时，若锁被其他线程占用着，那么当前只能被阻塞，直到成功获取锁。</li>
+<li>Lock则提供超时锁和可中断等更加灵活的方式，在未能获取锁的条件下提供一种退出的机制。</li>
+</ul>
+<h5 id="锁占有模式">锁占有模式
+</h5><ul>
+<li>synchronized对线程的同步仅提供独占模式，</li>
+<li>Lock既可以提供独占模式，也可以提供共享模式</li>
+</ul>
+<h5 id="条件队列">条件队列
+</h5><p>一个锁内部可以有多个Condition实例，即有多路条件队列，而synchronized只有一路条件队列</p>
+<p>同样Condition也提供灵活的阻塞方式，在未获得通知之前可以通过中断线程以及设置等待时限等方式退出条件队列。</p>
+<h5 id="总结">总结
+</h5><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>synchronized</th>
+          <th>Lock</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>关键字</td>
+          <td>接口/类</td>
+      </tr>
+      <tr>
+          <td>自动加锁和释放锁</td>
+          <td>需要手动调用unlock()方法释放锁</td>
+      </tr>
+      <tr>
+          <td>JVM层面的锁</td>
+          <td>API层面的锁</td>
+      </tr>
+      <tr>
+          <td>非公平锁</td>
+          <td>可以选择公平或者非公平锁</td>
+      </tr>
+      <tr>
+          <td>锁是一个对象，并且锁的信息保存在了对象中</td>
+          <td>代码中通过int类型的state标识</td>
+      </tr>
+      <tr>
+          <td>有一个锁升级的过程</td>
+          <td>无</td>
+      </tr>
+  </tbody>
+</table></div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/yuan/p/jvm/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JVM</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JavaWEB和SSM题库</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/nginx/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Nginx</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 米饭能吃饱
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/yuan/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
