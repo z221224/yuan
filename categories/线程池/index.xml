@@ -6,10 +6,11 @@
         <description>Recent content in 线程池 on 米 粒</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <copyright>米饭能吃饱</copyright><atom:link href="https://z221224.github.io/yuan/categories/%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <copyright>米饭能吃饱</copyright>
+        <lastBuildDate>Sat, 04 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/categories/%E7%BA%BF%E7%A8%8B%E6%B1%A0/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>线程池</title>
         <link>https://z221224.github.io/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/</link>
-        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        <pubDate>Sat, 04 Jan 2025 00:00:00 +0000</pubDate>
         
         <guid>https://z221224.github.io/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/</guid>
         <description>&lt;h2 id=&#34;java并发编程多线程&#34;&gt;Java并发编程（多线程）

@@ -10,7 +10,7 @@
 <meta property='og:description' content="Java并发编程（多线程）\r创建多线程的四种方式\rJava中使用Thread类代表线程，所以不管使用什么方式创建多线程本质上都是创建新的Thread对象，然后再调用start()方法启动线程\n所不同的是：打算放在新线程中要执行的任务如何封装\n继承Thread类\r定义一个类继承自 Thread 类，并重写 run() 方法。 创建该类的对象，并调用其 start() 方法启动新线程。 实现Runnable接口\r定义一个类并实现 Runnable 接口的 run() 方法。 创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。 调用 Thread 实例的 start() 方法启动新线程。 实现Callable接口（需借助FutureTask）\r定义一个类并实现 Callable 接口的 call() 方法。 创建一个 FutureTask 对象，将 Callable 实例作为参数传入。 将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。 通过 FutureTask 对象的 get() 方法获取异步计算的结果。 使用线程池\r创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。 提交实现了 Runnable 或 Callable 接口的任务到执行器服务。 执行器服务会自动分配线程来执行这些任务。 多线程生命周期\r背记\r新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。 就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。 运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。 阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。 等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。 计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。 终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。 线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。\n">
 <meta property='og:url' content='https://z221224.github.io/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/'>
 <meta property='og:site_name' content='米 粒'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' />
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-04T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-01-04T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="线程池">
 <meta name="twitter:description" content="Java并发编程（多线程）\r创建多线程的四种方式\rJava中使用Thread类代表线程，所以不管使用什么方式创建多线程本质上都是创建新的Thread对象，然后再调用start()方法启动线程\n所不同的是：打算放在新线程中要执行的任务如何封装\n继承Thread类\r定义一个类继承自 Thread 类，并重写 run() 方法。 创建该类的对象，并调用其 start() 方法启动新线程。 实现Runnable接口\r定义一个类并实现 Runnable 接口的 run() 方法。 创建该类的对象，并将其作为目标传递给一个 Thread 类的实例。 调用 Thread 实例的 start() 方法启动新线程。 实现Callable接口（需借助FutureTask）\r定义一个类并实现 Callable 接口的 call() 方法。 创建一个 FutureTask 对象，将 Callable 实例作为参数传入。 将 FutureTask 对象作为目标传递给一个 Thread 类的实例，并启动线程。 通过 FutureTask 对象的 get() 方法获取异步计算的结果。 使用线程池\r创建一个执行器服务，例如 Executors.newFixedThreadPool(int nThreads) 。 提交实现了 Runnable 或 Callable 接口的任务到执行器服务。 执行器服务会自动分配线程来执行这些任务。 多线程生命周期\r背记\r新建（New）：线程被创建后，尚未启动（未调用start()方法）的状态。 就绪（Runnable）：当线程对象的start()方法被调用后，线程进入就绪状态，此时线程已经准备好执行，等待CPU调度。 运行（Running）：当CPU开始调度处于就绪状态的线程时，线程进入运行状态，开始执行其任务。 阻塞（Blocked）：线程在运行过程中遇到同步锁但申请锁失败，会进入阻塞状态，此时需要获取到锁之后才会继续执行。 等待（Waiting）：线程在执行过程中可能会进入等待状态，例如调用了wait()方法，等待其他线程的通知、唤醒，才能继续执行。 计时等待（Timed Waiting）：与等待状态类似，但在此状态下的线程有一个预定的等待时间，超时后自动返回到就绪状态。 终止（Terminated）：线程完成任务或者因为异常而结束执行，进入终止状态。 线程状态的管理通常是由操作系统和编程语言的运行时环境共同完成的。\n">
     </head>
@@ -350,6 +350,19 @@
     
     
     <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-01-04</time>
+            </div>
         
 
         
