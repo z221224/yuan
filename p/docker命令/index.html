@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-cn" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r\u200b 安装和镜像加速器配置参考课件\n镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\r[root@atguigu docker]# docker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r\u200b\t\u200b\t2.创建守护式容器 docker run -id &ndash;name=mycentos centos:7\n">
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t\u200b\n">
 <title>docker命令</title>
 
 <link rel='canonical' href='https://z221224.github.io/yuan/p/docker%E5%91%BD%E4%BB%A4/'>
 
 <link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="docker命令">
-<meta property='og:description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r\u200b 安装和镜像加速器配置参考课件\n镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\r[root@atguigu docker]# docker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r\u200b\t\u200b\t2.创建守护式容器 docker run -id &ndash;name=mycentos centos:7\n">
+<meta property='og:description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t\u200b\n">
 <meta property='og:url' content='https://z221224.github.io/yuan/p/docker%E5%91%BD%E4%BB%A4/'>
 <meta property='og:site_name' content='米 粒'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-01-06T00:00:00&#43;00:00'/>
 <meta name="twitter:title" content="docker命令">
-<meta name="twitter:description" content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r\u200b 安装和镜像加速器配置参考课件\n镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\r[root@atguigu docker]# docker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r\u200b\t\u200b\t2.创建守护式容器 docker run -id &ndash;name=mycentos centos:7\n">
+<meta name="twitter:description" content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r\u200b\t删除镜像 # 删除单个镜像(-f 强制删除)： docker rmi -f 镜像ID\ndocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t\u200b\n">
     </head>
     <body class="
     article-page
@@ -367,14 +367,11 @@
 
 docker 是一个开源的应用容器引擎，基于 Go 语言开发。
 </code></pre>
-<p>​
-安装和镜像加速器配置参考课件</p>
 <h2 id="镜像常用命令">镜像常用命令
 </h2><pre><code>查看镜像：
 
 	中央仓库连接不上。进行  【docker search 镜像名称】   会报超时问题。暂时不管或科学上网。
-
-	[root@atguigu docker]# docker search redis
+	docker search redis
 	Error response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout
 
 拉取镜像(下载)
@@ -385,7 +382,7 @@ docker 是一个开源的应用容器引擎，基于 Go 语言开发。
 # 删除单个镜像(-f 强制删除)：
 docker rmi  -f 镜像ID</p>
 <pre><code>	docker rmi -f $(docker images -q)			# 慎用  根据id删除所有镜像
-
+ 
 帮助命令：
 	哪里命令不会，就在哪个命令后面增加--help查询帮助文档。
 	docker images --help
@@ -409,11 +406,10 @@ docker rmi  -f 镜像ID</p>
 		docker run -it --name=mycentos centos:7 /bin/bash	
 		交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。
 		exit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。
+	2.创建守护式容器
+		docker run -id --name=mycentos centos:7	
 </code></pre>
-<p>​		
-​	
-2.创建守护式容器
-docker run -id &ndash;name=mycentos centos:7</p>
+<p>​</p>
 <pre><code>3.停止容器、启动容器、重启容器
 	docker stop 容器名称或id
 	docker start 容器名称或id
@@ -423,7 +419,7 @@ docker run -id &ndash;name=mycentos centos:7</p>
 	docker rm -f 容器名称或id
 	
 		删除正在运行的容器是不允许的。可以先停止再删除  或  加 -f 强制删除。
-		[root@atguigu docker]# docker rm spzx_mysql
+		docker rm spzx_mysql
 		Error response from daemon: cannot remove container &quot;/spzx_mysql&quot;: container is running: stop the container before removing or force remove
 
 5.登录容器
