@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="知识点一：逻辑删除\r数据库添加字段 , 实体类添加属性 , 配置逻辑删除生效\n知识点二：@JsonIgnore\r: 忽略实体类的某个属性不转成也不接收JSON数据\n@JsonIgnore\n@TableLogic\n@Schema(description = &ldquo;逻辑删除&rdquo;)\n@TableField(&ldquo;is_deleted&rdquo;)\nprivate Byte isDeleted;\n知识点三：自动填充\r指定填充字段和策略 属性上-&gt; @TableFiled(fill = FieldFill.Insert | Update ) 定义填充值实现类 MetaObjectHandler(common模块下 / mybatis-plus&hellip;)\n@Component\npublic class MyMetaObjectHandler implements MetaObjectHandler {\n@Override\npublic void insertFill(MetaObject metaObject) {\nthis.strictInsertFill(metaObject, &ldquo;属性名&rdquo;, 属性类型.class, 填充的值); } 1 2 3 4 5 @Override public void updateFill(MetaObject metaObject) { log.info(&#34;开始更新填充...&#34;); this.strictUpdateFill(metaObject, &#34;属性名&#34;, 属性类型.class, 填充的值); } } 知识点四：自定义转化器\r基础转化器：\n1.1 定义个转化器类 实现 Converter&lt;String,目标类型&gt;接口\n1.2 重写转化方法 目标类型 converter方法(String 原数据值)\n1.3 方法中实现类型转化 if || 枚举.values() + for || 超出值范围抛异常\n1.4 springmvc的配置类中添加自定义转化器 addFormatter() 转化器工厂：\n1.1 定义工厂类 实现 ConverterFactory&lt;String,枚举的接口&gt;\n1.2 重写创建转化器的方法getConverter\n1.3 getConverter方法new Converter对象完成转化逻辑编写（class）\nclass.getEnumContents() == 枚举类型.values() 1.4 注册转化器工厂\nregistry.addConverterFactory(stringToBaseEnumConverterFactory); 2. json类型的转化器jackson\n@JsonValue即可完成json和枚举值的处理\n3. 数据库存储和获取转化器mybatis(typeHandler)\nhttps://www.baomidou.com/guides/auto-convert-enum/ @EnumValue //mybatis-plus 向数据库存储数据的时候，获取code属性进行存储 || 读取数据库数据的时候，将值赋值给code\n">
+<title>xm-知识点</title>
+
+<link rel='canonical' href='https://z221224.github.io/yuan/p/xm-%E7%9F%A5%E8%AF%86%E7%82%B9/'>
+
+<link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="xm-知识点">
+<meta property='og:description' content="知识点一：逻辑删除\r数据库添加字段 , 实体类添加属性 , 配置逻辑删除生效\n知识点二：@JsonIgnore\r: 忽略实体类的某个属性不转成也不接收JSON数据\n@JsonIgnore\n@TableLogic\n@Schema(description = &ldquo;逻辑删除&rdquo;)\n@TableField(&ldquo;is_deleted&rdquo;)\nprivate Byte isDeleted;\n知识点三：自动填充\r指定填充字段和策略 属性上-&gt; @TableFiled(fill = FieldFill.Insert | Update ) 定义填充值实现类 MetaObjectHandler(common模块下 / mybatis-plus&hellip;)\n@Component\npublic class MyMetaObjectHandler implements MetaObjectHandler {\n@Override\npublic void insertFill(MetaObject metaObject) {\nthis.strictInsertFill(metaObject, &ldquo;属性名&rdquo;, 属性类型.class, 填充的值); } 1 2 3 4 5 @Override public void updateFill(MetaObject metaObject) { log.info(&#34;开始更新填充...&#34;); this.strictUpdateFill(metaObject, &#34;属性名&#34;, 属性类型.class, 填充的值); } } 知识点四：自定义转化器\r基础转化器：\n1.1 定义个转化器类 实现 Converter&lt;String,目标类型&gt;接口\n1.2 重写转化方法 目标类型 converter方法(String 原数据值)\n1.3 方法中实现类型转化 if || 枚举.values() + for || 超出值范围抛异常\n1.4 springmvc的配置类中添加自定义转化器 addFormatter() 转化器工厂：\n1.1 定义工厂类 实现 ConverterFactory&lt;String,枚举的接口&gt;\n1.2 重写创建转化器的方法getConverter\n1.3 getConverter方法new Converter对象完成转化逻辑编写（class）\nclass.getEnumContents() == 枚举类型.values() 1.4 注册转化器工厂\nregistry.addConverterFactory(stringToBaseEnumConverterFactory); 2. json类型的转化器jackson\n@JsonValue即可完成json和枚举值的处理\n3. 数据库存储和获取转化器mybatis(typeHandler)\nhttps://www.baomidou.com/guides/auto-convert-enum/ @EnumValue //mybatis-plus 向数据库存储数据的时候，获取code属性进行存储 || 读取数据库数据的时候，将值赋值给code\n">
+<meta property='og:url' content='https://z221224.github.io/yuan/p/xm-%E7%9F%A5%E8%AF%86%E7%82%B9/'>
+<meta property='og:site_name' content='米 粒'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-01-06T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="xm-知识点">
+<meta name="twitter:description" content="知识点一：逻辑删除\r数据库添加字段 , 实体类添加属性 , 配置逻辑删除生效\n知识点二：@JsonIgnore\r: 忽略实体类的某个属性不转成也不接收JSON数据\n@JsonIgnore\n@TableLogic\n@Schema(description = &ldquo;逻辑删除&rdquo;)\n@TableField(&ldquo;is_deleted&rdquo;)\nprivate Byte isDeleted;\n知识点三：自动填充\r指定填充字段和策略 属性上-&gt; @TableFiled(fill = FieldFill.Insert | Update ) 定义填充值实现类 MetaObjectHandler(common模块下 / mybatis-plus&hellip;)\n@Component\npublic class MyMetaObjectHandler implements MetaObjectHandler {\n@Override\npublic void insertFill(MetaObject metaObject) {\nthis.strictInsertFill(metaObject, &ldquo;属性名&rdquo;, 属性类型.class, 填充的值); } 1 2 3 4 5 @Override public void updateFill(MetaObject metaObject) { log.info(&#34;开始更新填充...&#34;); this.strictUpdateFill(metaObject, &#34;属性名&#34;, 属性类型.class, 填充的值); } } 知识点四：自定义转化器\r基础转化器：\n1.1 定义个转化器类 实现 Converter&lt;String,目标类型&gt;接口\n1.2 重写转化方法 目标类型 converter方法(String 原数据值)\n1.3 方法中实现类型转化 if || 枚举.values() + for || 超出值范围抛异常\n1.4 springmvc的配置类中添加自定义转化器 addFormatter() 转化器工厂：\n1.1 定义工厂类 实现 ConverterFactory&lt;String,枚举的接口&gt;\n1.2 重写创建转化器的方法getConverter\n1.3 getConverter方法new Converter对象完成转化逻辑编写（class）\nclass.getEnumContents() == 枚举类型.values() 1.4 注册转化器工厂\nregistry.addConverterFactory(stringToBaseEnumConverterFactory); 2. json类型的转化器jackson\n@JsonValue即可完成json和枚举值的处理\n3. 数据库存储和获取转化器mybatis(typeHandler)\nhttps://www.baomidou.com/guides/auto-convert-enum/ @EnumValue //mybatis-plus 向数据库存储数据的时候，获取code属性进行存储 || 读取数据库数据的时候，将值赋值给code\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/yuan/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/yuan/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🕸️</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/yuan">米 粒</a></h1>
+            <h2 class="site-description">你感到痛苦，是因为你在成长</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://www.bilibili.com/'
+                        target="_blank"
+                        title="bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/z221224'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/yuan/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li>
+      <ol>
+        <li><a href="#知识点一逻辑删除">知识点一：逻辑删除</a></li>
+        <li><a href="#知识点二jsonignore">知识点二：@JsonIgnore</a></li>
+        <li><a href="#知识点三自动填充">知识点三：自动填充</a></li>
+        <li><a href="#知识点四自定义转化器">知识点四：自定义转化器</a></li>
+        <li><a href="#知识点五多表查询注意点">知识点五：多表查询注意点：</a></li>
+        <li><a href="#知识点六">知识点六：</a></li>
+        <li><a href="#知识点七全局异常处理">知识点七：全局异常处理</a></li>
+        <li><a href="#知识点八文件上传-minio">知识点八：文件上传-minio</a></li>
+        <li><a href="#知识点九mybatis-plus分页插件">知识点九：mybatis-plus分页插件</a></li>
+        <li><a href="#知识点十controller中方法的参数有多个integer-currentinteger-sizequeryvo-queryvo有实体类knife4j解析参数时会误解析成json这时候要在applicationyml里面添加配置springdocdefault-flat-param-object-true">知识点十：controller中方法的参数有多个（Integer current，Integer size，QueryVO queryVO），有实体类，knife4j解析参数时，会误解析成json，这时候要在application.yml里面添加配置：springdoc.default-flat-param-object: true</a></li>
+        <li><a href="#知识点十一异常处理流派">知识点十一：异常处理流派</a></li>
+        <li><a href="#知识点十二mybatis-plus字段更新策略">知识点十二：mybatis-plus字段更新策略</a></li>
+        <li><a href="#知识点十三mybatis-plus映射">知识点十三：mybatis-plus映射</a></li>
+        <li><a href="#知识点十四表查询的on和where">知识点十四：表查询的on和where</a></li>
+        <li><a href="#知识点十五定时任务">知识点十五：定时任务</a></li>
+        <li><a href="#知识点十六jackson注解">知识点十六：jackson注解</a></li>
+        <li><a href="#知识点十七base64">知识点十七：base64</a></li>
+        <li><a href="#知识点十八登录流程">知识点十八：登录流程</a></li>
+        <li><a href="#知识点十九拦截器">知识点十九：拦截器</a></li>
+        <li><a href="#知识点二十applicationyml配置文件可以提取">知识点二十：application.yml配置文件可以提取</a></li>
+        <li><a href="#知识点二十一排除">知识点二十一：排除</a></li>
+        <li><a href="#知识点二十二项目部署-虚拟机">知识点二十二：项目部署-虚拟机</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/yuan/categories/xm/" >
+                Xm
+            </a>
+        
+            <a href="/yuan/categories/%E7%9F%A5%E8%AF%86%E7%82%B9/" >
+                知识点
+            </a>
+        
+            <a href="/yuan/categories/xm-%E7%9F%A5%E8%AF%86%E7%82%B9/" >
+                Xm-知识点
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/yuan/p/xm-%E7%9F%A5%E8%AF%86%E7%82%B9/">xm-知识点</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-01-06</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 4 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h3 id="知识点一逻辑删除">知识点一：逻辑删除
+</h3><p>数据库添加字段 ,
+实体类添加属性 ,
+配置逻辑删除生效</p>
+<h3 id="知识点二jsonignore">知识点二：@JsonIgnore
+</h3><p>: <font color="#00b050">忽略实体类的某个属性不转成也不接收JSON数据</font></p>
+<p>@<font color="#ff0000">JsonIgnore</font><br>
+@<font color="#ff0000">TableLogic</font><br>
+@Schema(description = &ldquo;逻辑删除&rdquo;)<br>
+@TableField(&ldquo;is_deleted&rdquo;)<br>
+private Byte isDeleted;</p>
+<h3 id="知识点三自动填充">知识点三：自动填充
+</h3><ol>
+<li><font color="#ff0000">指定填充字段和策略 </font>
+属性上-&gt; <font color="#ff0000">@TableFiled(fill = FieldFill.Insert | Update )  </font></li>
+<li>定义填充值实现类 MetaObjectHandler(common模块下 / mybatis-plus&hellip;)<br>
+@Component<br>
+public class MyMetaObjectHandler <font color="#ff0000">implements MetaObjectHandler</font> {<br>
+@Override<br>
+public void insertFill(MetaObject metaObject) {<br>
+<font color="#ff0000"> this.strictInsertFill(metaObject, &ldquo;属性名&rdquo;, 属性类型.class, 填充的值);  </font>
+}</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	   @Override  
+</span></span><span class="line"><span class="cl">	   public void updateFill(MetaObject metaObject) {  
+</span></span><span class="line"><span class="cl">	       log.info(&#34;开始更新填充...&#34;);  
+</span></span><span class="line"><span class="cl">	       this.strictUpdateFill(metaObject, &#34;属性名&#34;, 属性类型.class, 填充的值);  
+</span></span><span class="line"><span class="cl">	   }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><pre><code>}
+</code></pre>
+<h3 id="知识点四自定义转化器">知识点四：自定义转化器
+</h3><p>基础转化器：<br>
+1.1 定义个转化器类 实现 Converter&lt;String,目标类型&gt;接口<br>
+1.2 重写转化方法 目标类型 converter方法(String 原数据值)<br>
+1.3 方法中实现类型转化 if || 枚举.values() + for || 超出值范围抛异常<br>
+1.4 springmvc的配置类中添加自定义转化器 <font color="#00b050">addFormatter()  </font>
+<font color="#ff0000">转化器工厂</font>：<br>
+1.1 定义工厂类 实现 <strong>ConverterFactory&lt;String,枚举的接口&gt;</strong><br>
+1.2 重写创建转化器的方法getConverter<br>
+1.3 getConverter方法new Converter对象完成转化逻辑编写（class）<br>
+<font color="#ff0000">class.getEnumContents() == 枚举类型.values()  </font>
+1.4 注册转化器工厂<br>
+<font color="#ff0000"> registry.addConverterFactory(stringToBaseEnumConverterFactory);  </font>
+2. json类型的转化器jackson<br>
+<font color="#ff0000">@JsonValue</font>即可完成json和枚举值的处理<br>
+3. 数据库存储和获取转化器mybatis(typeHandler)<br>
+<a class="link" href="https://www.baomidou.com/guides/auto-convert-enum/"  target="_blank" rel="noopener"
+    >https://www.baomidou.com/guides/auto-convert-enum/</a>   @EnumValue //mybatis-plus 向数据库存储数据的时候，获取code属性进行存储 || 读取数据库数据的时候，将值赋值给code</p>
+<p>转换器工厂：实现implements ConverterFactory&lt;String, BaseEnum&gt;接口</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@Component</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">StringToBaseEnumConverterFactory</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">ConverterFactory</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">BaseEnum</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nd">@Override</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="kd">extends</span><span class="w"> </span><span class="n">BaseEnum</span><span class="o">&gt;</span><span class="w"> </span><span class="n">Converter</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">getConverter</span><span class="p">(</span><span class="n">Class</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="n">targetType</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Converter</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">&gt;</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="nd">@Override</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kd">public</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="nf">convert</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">source</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">enumConstant</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">targetType</span><span class="p">.</span><span class="na">getEnumConstants</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">enumConstant</span><span class="p">.</span><span class="na">getCode</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">source</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                        </span><span class="k">return</span><span class="w"> </span><span class="n">enumConstant</span><span class="p">;</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="s">&#34;类型错误&#34;</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">};</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点五多表查询注意点">知识点五：多表查询注意点：
+</h3><ul>
+<li>多表查询，需要自定义查询                                                                                                方法和结果集映射（外连接 | resultMap）</li>
+<li>自定义查询需要处理逻辑删除条件问题 is_deleted = 0</li>
+<li>外连接条件 where和on条件的区别<br>
+<font color="#ff0000">一旦使用外连接， where后面不能放子表的查询条件</font>。
+情况： 主表有数据  子表没数据 条件都不为nul都出现问题
+<ul>
+<li>解决： on后面可以添加子表的条件，on在合并之前进行赛选。 on后面的条件不会破坏外连接的特性， 一定保证主表的数据会被查询到。</li>
+</ul>
+</li>
+</ul>
+<h3 id="知识点六">知识点六：
+</h3><h3 id="知识点七全局异常处理">知识点七：全局异常处理
+</h3><p>①在common模块写一个类   加注解@RestControllerAdvice
+②在这个类的方法上面加注解  @ExceptionHandler</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">全局异常处理实现(common | springmvc)
+</span></span><span class="line"><span class="cl">       common中导入web-starter (springmvc jackson)
+</span></span><span class="line"><span class="cl">       &lt;dependency&gt;
+</span></span><span class="line"><span class="cl">           &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+</span></span><span class="line"><span class="cl">           &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+</span></span><span class="line"><span class="cl">       &lt;/dependency&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点八文件上传-minio">知识点八：文件上传-minio
+</h3><ul>
+<li>注意事项:
+文件上传默认的大小是1MB
+修改文件:
+spring:
+servlet:
+multipart:
+max-file-size: 20MB  #单个文件大小
+max-request-size: 60MB # 一次请求的大小</li>
+</ul>
+<p>①@ConfigurationProperties(prefix=&ldquo;minio&rdquo;)
+必须加入到ioc容器
+方式一 ：@Component<br>
+方式二：EnableConfigurationProperties(xxx.class)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="w">      </span><span class="nd">@ConfigurationProperties</span><span class="p">(</span><span class="n">prefix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#34;minio&#34;</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nd">@Data</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MinioProperties</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="c1">//@Value(&#34;${minio.endpoint}&#34;) 单独读取</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">endpoint</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">accessKey</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">secretKey</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">private</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">bucketName</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>②web / web-admin /application配置文件声明参数
+声明四个参数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">      minio:
+</span></span><span class="line"><span class="cl">        endpoint: \http://47.94.86.115:9000 #注意: 不要加 /
+</span></span><span class="line"><span class="cl">        secret-key: minioadmin
+</span></span><span class="line"><span class="cl">        access-key: minioadmin
+</span></span><span class="line"><span class="cl">        bucket-name: lease0923
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>③编写minioClient的配置类 (MinioClient加入ioc容器)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="w">      </span><span class="nd">@EnableConfigurationProperties</span><span class="p">(</span><span class="n">MinioProperties</span><span class="p">.</span><span class="na">class</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nd">@Configuration</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">MinioConfiguration</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nd">@Autowired</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">private</span><span class="w"> </span><span class="n">MinioProperties</span><span class="w"> </span><span class="n">minioProperties</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nd">@Bean</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="kd">public</span><span class="w"> </span><span class="n">MinioClient</span><span class="w"> </span><span class="nf">minioClient</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="n">MinioClient</span><span class="w"> </span><span class="n">minioClient</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MinioClient</span><span class="p">.</span><span class="na">builder</span><span class="p">().</span><span class="na">endpoint</span><span class="p">(</span><span class="n">minioProperties</span><span class="p">.</span><span class="na">getEndpoint</span><span class="p">()).</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                      </span><span class="n">credentials</span><span class="p">(</span><span class="n">minioProperties</span><span class="p">.</span><span class="na">getAccessKey</span><span class="p">(),</span><span class="w"> </span><span class="n">minioProperties</span><span class="p">.</span><span class="na">getSecretKey</span><span class="p">()).</span><span class="na">build</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">              </span><span class="k">return</span><span class="w"> </span><span class="n">minioClient</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>④编写文件上传的具体业务 FileController | FileService&hellip;</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-gdscript3" data-lang="gdscript3"><span class="line"><span class="cl"><span class="ne">String</span> <span class="n">url</span> <span class="o">=</span>  <span class="n">fileService</span><span class="o">.</span><span class="n">uploadFile</span><span class="p">(</span><span class="n">file</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">       <span class="k">return</span> <span class="n">Result</span><span class="o">.</span><span class="n">ok</span><span class="p">(</span><span class="n">url</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">       <span class="err">@</span><span class="n">Override</span>
+</span></span><span class="line"><span class="cl">       <span class="n">public</span> <span class="ne">String</span> <span class="n">uploadFile</span><span class="p">(</span><span class="n">MultipartFile</span> <span class="n">file</span><span class="p">)</span> <span class="n">throws</span> <span class="n">ServerException</span><span class="p">,</span> <span class="n">InsufficientDataException</span><span class="p">,</span> <span class="n">ErrorResponseException</span><span class="p">,</span> <span class="n">IOException</span><span class="p">,</span> <span class="n">NoSuchAlgorithmException</span><span class="p">,</span> <span class="n">InvalidKeyException</span><span class="p">,</span> <span class="n">InvalidResponseException</span><span class="p">,</span> <span class="n">XmlParserException</span><span class="p">,</span> <span class="n">InternalException</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="err">步骤</span><span class="mi">1</span><span class="p">:</span> <span class="err">判断桶是否存在</span>
+</span></span><span class="line"><span class="cl">           <span class="n">boolean</span> <span class="n">bucketExists</span> <span class="o">=</span> <span class="n">minioClient</span><span class="o">.</span><span class="n">bucketExists</span><span class="p">(</span><span class="n">BucketExistsArgs</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">())</span><span class="o">.</span><span class="n">build</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="err">步骤</span><span class="mi">2</span><span class="p">:</span> <span class="err">不存在</span><span class="p">,</span><span class="err">创建桶以及设置访问权限</span>
+</span></span><span class="line"><span class="cl">           <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bucketExists</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">               <span class="o">//</span><span class="err">创建桶</span>
+</span></span><span class="line"><span class="cl">               <span class="n">minioClient</span><span class="o">.</span><span class="n">makeBucket</span><span class="p">(</span><span class="n">MakeBucketArgs</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">())</span><span class="o">.</span><span class="n">build</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">               <span class="o">//</span><span class="err">设置权限</span>
+</span></span><span class="line"><span class="cl">               <span class="o">//</span><span class="err">设置</span><span class="n">hello</span><span class="o">-</span><span class="n">minio桶的访问权限</span>
+</span></span><span class="line"><span class="cl">               <span class="ne">String</span> <span class="n">policy</span> <span class="o">=</span> <span class="s2">&#34;&#34;&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">                           {
+</span></span></span><span class="line"><span class="cl"><span class="s2">                             &#34;Statement&#34; : [ {
+</span></span></span><span class="line"><span class="cl"><span class="s2">                               &#34;Action&#34; : &#34;s3:GetObject&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s2">                               &#34;Effect&#34; : &#34;Allow&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s2">                               &#34;Principal&#34; : &#34;*&#34;,
+</span></span></span><span class="line"><span class="cl"><span class="s2">                               &#34;Resource&#34; : &#34;arn:aws:s3:::</span><span class="si">%s</span><span class="s2">/*&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">                             } ],
+</span></span></span><span class="line"><span class="cl"><span class="s2">                             &#34;Version&#34; : &#34;2012-10-17&#34;
+</span></span></span><span class="line"><span class="cl"><span class="s2">                           }&#34;&#34;&#34;</span><span class="o">.</span><span class="n">formatted</span><span class="p">(</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">               <span class="n">minioClient</span><span class="o">.</span><span class="n">setBucketPolicy</span><span class="p">(</span><span class="n">SetBucketPolicyArgs</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span><span class="o">.</span>
+</span></span><span class="line"><span class="cl">                       <span class="n">bucket</span><span class="p">(</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">                       <span class="o">.</span><span class="n">config</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">           <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="err">步骤</span><span class="mi">3</span><span class="p">:</span> <span class="err">向桶中传递文件</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="n">todo</span><span class="p">:</span> <span class="err">文件重名的问题</span>  <span class="n">uuid</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">getOriginalFilename</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="n">todo</span><span class="p">:</span> <span class="err">文件直接放在桶中太乱的问题</span>
+</span></span><span class="line"><span class="cl">           <span class="o">//</span> <span class="mi">20241210</span><span class="o">/</span><span class="n">uuid_对象名</span><span class="o">.</span><span class="n">png</span>
+</span></span><span class="line"><span class="cl">           <span class="ne">String</span> <span class="n">objectName</span> <span class="o">=</span> <span class="n">new</span> <span class="n">SimpleDateFormat</span><span class="p">(</span><span class="s2">&#34;yyyyMMdd&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new</span> <span class="n">Date</span><span class="p">())</span> <span class="o">+</span> <span class="s2">&#34;/&#34;</span> <span class="o">+</span> <span class="n">UUID</span><span class="o">.</span><span class="n">randomUUID</span><span class="p">()</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span><span class="o">.</span><span class="n">replaceAll</span><span class="p">(</span><span class="s2">&#34;-&#34;</span><span class="p">,</span><span class="s2">&#34;&#34;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&#34;_&#34;</span> <span class="o">+</span> <span class="n">file</span><span class="o">.</span><span class="n">getOriginalFilename</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="n">minioClient</span><span class="o">.</span><span class="n">uploadObject</span><span class="p">()</span> <span class="err">传递本地存在的文件</span> <span class="n">c</span> <span class="n">d</span> <span class="n">f</span> <span class="o">...</span>  <span class="n">filename</span> <span class="o">=</span> <span class="err">文件的地址</span>
+</span></span><span class="line"><span class="cl">           <span class="o">//</span><span class="n">minioClient</span><span class="o">.</span><span class="n">putObject</span><span class="p">()</span> <span class="err">传递内存中存在文件数据</span> <span class="err">流</span> <span class="o">|</span> <span class="err">字节数组</span>
+</span></span><span class="line"><span class="cl">           <span class="n">minioClient</span><span class="o">.</span><span class="n">putObject</span><span class="p">(</span><span class="n">PutObjectArgs</span><span class="o">.</span><span class="n">builder</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">                   <span class="o">.</span><span class="n">bucket</span><span class="p">(</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">                   <span class="o">.</span><span class="n">object</span><span class="p">(</span><span class="n">objectName</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                   <span class="o">.</span><span class="n">stream</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">getInputStream</span><span class="p">(),</span><span class="n">file</span><span class="o">.</span><span class="n">getSize</span><span class="p">(),</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="o">//-</span><span class="mi">1</span> <span class="err">不切割原有文件大小</span>
+</span></span><span class="line"><span class="cl">                   <span class="o">.</span><span class="n">contentType</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">getContentType</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">                   <span class="o">.</span><span class="n">build</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">           <span class="k">return</span> <span class="ne">String</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&#34;/&#34;</span><span class="p">,</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getEndpoint</span><span class="p">(),</span><span class="n">minioProperties</span><span class="o">.</span><span class="n">getBucketName</span><span class="p">(),</span><span class="n">objectName</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">       <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点九mybatis-plus分页插件">知识点九：mybatis-plus分页插件
+</h3><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="w"> </span><span class="nd">@Bean</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="kd">public</span><span class="w"> </span><span class="n">MybatisPlusInterceptor</span><span class="w"> </span><span class="nf">mybatisPlusInterceptor</span><span class="p">(){</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">               </span><span class="n">MybatisPlusInterceptor</span><span class="w"> </span><span class="n">mybatisPlusInterceptor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MybatisPlusInterceptor</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">               </span><span class="n">mybatisPlusInterceptor</span><span class="p">.</span><span class="na">addInnerInterceptor</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">PaginationInnerInterceptor</span><span class="p">(</span><span class="n">DbType</span><span class="p">.</span><span class="na">MYSQL</span><span class="p">));</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">               </span><span class="k">return</span><span class="w"> </span><span class="n">mybatisPlusInterceptor</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">           </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点十controller中方法的参数有多个integer-currentinteger-sizequeryvo-queryvo有实体类knife4j解析参数时会误解析成json这时候要在applicationyml里面添加配置springdocdefault-flat-param-object-true">知识点十：controller中方法的参数有多个（Integer current，Integer size，QueryVO queryVO），有实体类，knife4j解析参数时，会误解析成json，这时候要在application.yml里面添加配置：springdoc.default-flat-param-object: true
+</h3><h3 id="知识点十一异常处理流派">知识点十一：异常处理流派
+</h3><p>抛异常：1.快速终止调用
+2.快速的捕捉结果，避免多层返回
+核心：
+1.springmvc全局异常处理
+2.自定义异常
+<img src="/yuan/%e5%bc%82%e5%b8%b8%e5%a4%84%e7%90%86%e6%b5%81%e6%b4%be1.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="|475"
+	
+	
+></p>
+<h3 id="知识点十二mybatis-plus字段更新策略">知识点十二：mybatis-plus字段更新策略
+</h3><p><strong>Mybatis-Plus update strategy</strong>
+使用Mybatis-Plus提供的更新方法时，若实体中的字段为<code>null</code>，默认情况下，最终生成的update语句中，不会包含该字段。若想改变默认行为，可做以下配置。</p>
+<ul>
+<li>
+<p>全局配置
+在<code>application.yml</code>中配置如下参数
+mybatis-plus:<br>
+global-config:<br>
+   db-config:<br>
+     update-strategy: &lt;\strategy&gt;</p>
+<p><strong>注</strong>：上述<code>&lt;strategy&gt;</code>可选值有：<code>ignore</code>、<code>not_null</code>、<code>not_empty</code>、<code>never</code>，默认值为<code>not_null</code></p>
+<ul>
+<li><code>ignore</code>：忽略空值判断，不管字段是否为空，都会进行更新</li>
+<li><code>not_null</code>：进行非空判断，字段非空才会进行判断</li>
+<li><code>not_empty</code>：进行非空判断，并进行非空串（&quot;&quot;）判断，主要针对字符串类型</li>
+<li><code>never</code>：从不进行更新，不管该字段为何值，都不更新</li>
+</ul>
+</li>
+<li>
+<p>局部配置
+在实体类中的具体字段通过<code>@TableField</code>注解进行配置，如下：</p>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	@Schema(description = &#34;密码&#34;)
+</span></span><span class="line"><span class="cl">	@TableField(value = &#34;password&#34;, updateStrategy = FieldStrategy.NOT_EMPTY)
+</span></span><span class="line"><span class="cl">	private String password;   
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点十三mybatis-plus映射">知识点十三：mybatis-plus映射
+</h3><p>full
+<font color="#ff0000">auto-mapping-behavior: full</font></p>
+<ul>
+<li>列名不能重复</li>
+<li>设置嵌套模式为full，不用全部编写result标签</li>
+<li>自定义查询语句都需要思考逻辑删除问题</li>
+</ul>
+<h3 id="知识点十四表查询的on和where">知识点十四：表查询的on和where
+</h3><p>on是在两张表left join之前过滤一遍子表
+where是在两张表left join 之后对整张表进行过滤</p>
+<h3 id="知识点十五定时任务">知识点十五：定时任务
+</h3><p>周期性的工作和安排。</p>
+<p><font color="#ff0000">springboot自带定时任务</font>。</p>
+<p>步骤一：开启定时任务&ndash;<font color="#ff0000">@Scheduling</font>【启动类】
+步骤二：定义一个方法，编写定时任务逻辑
+步骤三：设置方法的执行周期（cron表达式） @Scheduled（crons = “* * * * * *”）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">@Component
+</span></span><span class="line"><span class="cl">public class MyTask {
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    @Autowired
+</span></span><span class="line"><span class="cl">    private LeaseAgreementService leaseAgreementService;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    //定期检查租约状态
+</span></span><span class="line"><span class="cl">    @Scheduled(cron = &#34;0 0 1 * * *&#34;)
+</span></span><span class="line"><span class="cl">    public void leaseAgreementCheckStatus() {
+</span></span><span class="line"><span class="cl">        LambdaUpdateWrapper&lt;LeaseAgreement&gt; updateWrapper = new LambdaUpdateWrapper&lt;&gt;();
+</span></span><span class="line"><span class="cl">        updateWrapper.lt(LeaseAgreement::getLeaseEndDate,new Date());
+</span></span><span class="line"><span class="cl">        updateWrapper.in(LeaseAgreement::getStatus, LeaseStatus.SIGNED,LeaseStatus.WITHDRAWING,LeaseStatus.RENEWING);
+</span></span><span class="line"><span class="cl">        updateWrapper.set(LeaseAgreement::getStatus,LeaseStatus.EXPIRED);
+</span></span><span class="line"><span class="cl">        leaseAgreementService.update(updateWrapper);
+</span></span><span class="line"><span class="cl">    }
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点十六jackson注解">知识点十六：jackson注解
+</h3><ul>
+<li>@<font color="#ff0000">JsonIgnore</font>&ndash;&gt;某个属性要忽略不生成json。</li>
+<li>@<font color="#ff0000">JsonFormat</font>&ndash;&gt;时间格式和时区设置。【也可以在yml文件全局配置：spring,jackson.date-format】</li>
+<li>@<font color="#ff0000">JsonProperty</font>&ndash;&gt;<font color="#ff0000">后台实体类的名称和接口文档不一致时候</font>。
+修改属性生成json的key：
+User  id  name
+name&mdash;&gt;@JsonProperty(&ldquo;username&rdquo;)
+{id:1,username:&lsquo;xxx&rsquo;}</li>
+</ul>
+<h3 id="知识点十七base64">知识点十七：base64
+</h3><p>base64是一种转码和解码的工具，可以将任何内容转成字符串。
+如：&lt;\img src=&ldquo;base64字符串&rdquo;&gt;   前端自动解码</p>
+<h3 id="知识点十八登录流程">知识点十八：登录流程
+</h3><p>1.获取验证码 &mdash;-&gt; 后台请求<br>
+1、生成验证码图片和正确的验证码
+2、生成uuid
+3、uuid  +  验证码  +  有效时间  &ndash;&gt; 存储到redis
+4、将图片和key（uuid）返回给前端
+2.登录实现
+前端&ndash;&gt;账号  密码  输入的验证码   uuid<br>
+后台&ndash;&gt;
+1.校验验证码
+2.校验账号
+3.校验密码（加密）
+4.校验用户是否可用
+5.生成token
+6.返回token
+3.获取用户信息
+前端 -&gt; token -&gt;后台 -&gt; 解析token -&gt; 用户 -&gt;查询用户数据 -&gt; 返回</p>
+<h3 id="知识点十九拦截器">知识点十九：拦截器
+</h3><p>1.定义拦截器   &mdash;&mdash;&mdash;&ndash;&gt;实现HandlerInterceptor接口，重写方法
+2.编写拦截逻辑</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="nd">@Component</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="kd">public</span><span class="w"> </span><span class="kd">class</span> <span class="nc">LoginInterceptor</span><span class="w"> </span><span class="kd">implements</span><span class="w"> </span><span class="n">HandlerInterceptor</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nd">@Override</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kt">boolean</span><span class="w"> </span><span class="nf">preHandle</span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">HttpServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="w"> </span><span class="n">handler</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//1.获取request中请求头的token [access_token]  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">accessToken</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">request</span><span class="p">.</span><span class="na">getHeader</span><span class="p">(</span><span class="s">&#34;access_token&#34;</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//2.检查token是否为null  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ObjectUtils</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">(</span><span class="n">accessToken</span><span class="p">)){</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">//没有token 没有登录  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">throw</span><span class="w">  </span><span class="k">new</span><span class="w"> </span><span class="n">LeaseException</span><span class="p">(</span><span class="n">ResultCodeEnum</span><span class="p">.</span><span class="na">ADMIN_LOGIN_AUTH</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//3.检查token是否过期和有效  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//内部自动抛异常  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">JwtUtil</span><span class="p">.</span><span class="na">parseToken</span><span class="p">(</span><span class="n">accessToken</span><span class="p">);</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="c1">//true放行 | false拦截  [if(! preHandler()) return ;]  </span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">true</span><span class="p">;</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">  
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>3.注册拦截器  &mdash;&mdash;&mdash;&mdash;&gt;配置类 实现WebMvcConfigure，addInterceptor
+4.设置拦截器,以及指定拦截和放行地址(mvc)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">@Override  
+</span></span><span class="line"><span class="cl">    public void addInterceptors(InterceptorRegistry registry) {  
+</span></span><span class="line"><span class="cl">        registry.addInterceptor(loginInterceptor)  
+</span></span><span class="line"><span class="cl">                //匿名资源: 登录 获取验证码  
+</span></span><span class="line"><span class="cl">                .addPathPatterns(&#34;/admin/**&#34;).excludePathPatterns(&#34;/admin/login/**&#34;);  
+</span></span><span class="line"><span class="cl">    }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="知识点二十applicationyml配置文件可以提取">知识点二十：application.yml配置文件可以提取
+</h3><p>配置文件，提取出来到其他模块</p>
+<h3 id="知识点二十一排除">知识点二十一：排除
+</h3><p>自动化加载排除：
+@SpringbootApplication(exclude={MinioConfiguration.class})
+componentScan扫描排除：
+@ComponentScan(excludeFilters = @ComponentScan.Filter(&hellip;&hellip;.))</p>
+<h3 id="知识点二十二项目部署-虚拟机">知识点二十二：项目部署-虚拟机
+</h3><p><img src="/yuan/stgy%e9%83%a8%e7%bd%b2%e6%ad%a5%e9%aa%a4.png"
+	
+	
+	
+	loading="lazy"
+	
+	
+></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 米饭能吃饱
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/yuan/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
