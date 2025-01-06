@@ -30,13 +30,13 @@ docker 是一个开源的应用容器引擎，基于 Go 语言开发。
 	Error response from daemon: Get &amp;quot;https://index.docker.io/v1/search?q=redis&amp;amp;n=25&amp;quot;: net/http: TLS handshake timeout
 
 拉取镜像(下载)
-	docker pull 镜像名称[:tag]             如果不指定版本号，表示下载最新版本
+	docker pull 镜像名称[:tag]    如果不指定版本号，表示下载最新版本
 &lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;​	
 删除镜像
 # 删除单个镜像(-f 强制删除)：
 docker rmi  -f 镜像ID&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;	docker rmi -f $(docker images -q)			# 慎用  根据id删除所有镜像
+&lt;pre&gt;&lt;code&gt;	docker rmi -f $(docker images -q)	# 慎用  根据id删除所有镜像
  
 帮助命令：
 	哪里命令不会，就在哪个命令后面增加--help查询帮助文档。
@@ -81,28 +81,28 @@ docker rmi  -f 镜像ID&lt;/p&gt;
 	docker exec -it 容器名称 /bin/bash
 
 6.其他命令
-	docker logs -f 容器名称/容器的id						# 查询容器内进程日志，-f参数表示实时监控日志信息     ctrl + c
-	docker inspect 容器名称/容器的id						# 查看容器的详情信息
-	docker cp 											    # 完成容器和宿主机之间的文件copy    容器即使停止也可以拷贝。	
+	docker logs -f 容器名称/容器的id	# 查询容器内进程日志，-f参数表示实时监控日志信息     ctrl + c
+	docker inspect 容器名称/容器的id	# 查看容器的详情信息
+	docker cp 						 # 完成容器和宿主机之间的文件copy    容器即使停止也可以拷贝。	
 		
 		docker cp ./nginx.tar  mycentos_01:/opt			
 		docker cp mycentos_01:/opt/nginx.tar ./
 
 7.备份与迁移
 
-	docker commit 容器名称/容器的id 镜像名称			  # 把docker容器保存成一个镜像
-	docker save -o 镜像tar文件名称 镜像名称/镜像id		  # 把镜像保存为tar文件
-	docker load -i 镜像tar文件名称						  # 把tar文件恢复成为一个镜像
+	docker commit 容器名称/容器的id 镜像名称		 # 把docker容器保存成一个镜像
+	docker save -o 镜像tar文件名称 镜像名称/镜像id	# 把镜像保存为tar文件
+	docker load -i 镜像tar文件名称				# 把tar文件恢复成为一个镜像
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h2 id=&#34;数据卷&#34;&gt;数据卷
 &lt;/h2&gt;&lt;pre&gt;&lt;code&gt;数据卷就是将容器里的目录和宿主机目录进行映射。将容器里的目录数据备份到宿主机目录里。容器删除，容器里的数据没了。
 但是，重新创建容器，将容器里的目录跟宿主机目录进行挂载 ，数据就可以找回。(异地备份)
 
 关于数据卷的操作：
-	docker volume ls                            # 查看数据卷列表
-	docker volume create 数据卷名称             # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data    
-	docker volume inspect 数据卷名称            # 查看数据详情
-	docker volume rm 数据卷名称                 # 删除指定的数据卷
+	docker volume ls                    # 查看数据卷列表
+	docker volume create 数据卷名称      # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data    
+	docker volume inspect 数据卷名称     # 查看数据详情
+	docker volume rm 数据卷名称          # 删除指定的数据卷
 
 数据卷挂载：案例
 	docker run -d --name=redis01 -p 6380:6379 -v redis-data:/data redis:7.0.10
