@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r好处：\r可移植性\r可伸缩\r隔离性\r资源利用率高\r镜像加速器配置：\rsudo mkdir -p /etc/docker\rsudo tee /etc/docker/daemon.json &lt;&lt;-'EOF'\r{\r&quot;registry-mirrors&quot;: [\r&quot;https://registry.dockermirror.com&quot;,\r&quot;阿里镜像&quot;,\r&quot;https://docker.nju.edu.cn&quot;,\r&quot;https://hub.littlediary.cn&quot;,\r&quot;https://hub.xdark.top&quot;,\r&quot;https://dockerpull.org&quot;,\r&quot;https://hub.crdz.gq&quot;,\r&quot;https://docker.1panel.live&quot;,\r&quot;https://docker.unsee.tech&quot;\r]\r}\rEOF\rsudo systemctl daemon-reload\rsudo systemctl restart docker\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r删除镜像\r# 删除单个镜像(-f 强制删除)：\rdocker rmi -f 镜像ID\rdocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t3.停止容器、启动容器、重启容器\rdocker stop 容器名称或id\rdocker start 容器名称或id\rdocker restart 容器名称或id\r4.删除容器 （-f force）\rdocker rm -f 容器名称或id\r删除正在运行的容器是不允许的。可以先停止再删除 或 加 -f 强制删除。\rdocker rm spzx_mysql\rError response from daemon: cannot remove container &quot;/spzx_mysql&quot;: container is running: stop the container before removing or force remove\r5.登录容器\rdocker exec -it 容器名称 /bin/bash\r6.其他命令\rdocker logs -f 容器名称/容器的id\t# 查询容器内进程日志，-f参数表示实时监控日志信息 ctrl + c\rdocker inspect 容器名称/容器的id\t# 查看容器的详情信息\rdocker cp # 完成容器和宿主机之间的文件copy 容器即使停止也可以拷贝。\tdocker cp ./nginx.tar mycentos_01:/opt\tdocker cp mycentos_01:/opt/nginx.tar ./\r7.备份与迁移\rdocker commit 容器名称/容器的id 镜像名称\t# 把docker容器保存成一个镜像\rdocker save -o 镜像tar文件名称 镜像名称/镜像id\t# 把镜像保存为tar文件\rdocker load -i 镜像tar文件名称\t# 把tar文件恢复成为一个镜像\r数据卷\r数据卷就是将容器里的目录和宿主机目录进行映射。将容器里的目录数据备份到宿主机目录里。容器删除，容器里的数据没了。\r但是，重新创建容器，将容器里的目录跟宿主机目录进行挂载 ，数据就可以找回。(异地备份)\r关于数据卷的操作：\rdocker volume ls # 查看数据卷列表\rdocker volume create 数据卷名称 # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data docker volume inspect 数据卷名称 # 查看数据详情\rdocker volume rm 数据卷名称 # 删除指定的数据卷\r数据卷挂载：案例\rdocker run -d --name=redis01 -p 6380:6379 -v redis-data:/data redis:7.0.10\r目录挂载：案例\tdocker run -d --name redis02 -p 6381:6379 -v /redis-data:/data redis:7.0.10\rdockerfile\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 dockerfile就是一个编写相关指令的文本文件。通过这个文件可以创建想要的镜像。 阿里云公开镜像： 1. 登录阿里云Docker Registry $ docker login --username=yanjingkuang01 registry.cn-hangzhou.aliyuncs.com 用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。 您可以在访问凭证页面修改凭证密码。 2. 将镜像推送到Registry $ docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] $ docker push registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] 3. 从Registry中拉取镜像 $ docker pull registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] docker compose\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 Docker Compose作用：批量管理容器。 # 启动容器(如果不存在容器就创建、存在则修改) docker compose -f docker-compose.yml up -d # 删除所有容器 docker compose -f docker-compose.yml down # 停止所有容器 docker compose -f docker-compose.yml stop # 启动所有容器 docker compose -f docker-compose.yml start # 重启所有容器 docker compose -f docker-compose.yml restart ">
+<title>docker入门</title>
+
+<link rel='canonical' href='https://z221224.github.io/yuan/p/docker%E5%85%A5%E9%97%A8/'>
+
+<link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="docker入门">
+<meta property='og:description' content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r好处：\r可移植性\r可伸缩\r隔离性\r资源利用率高\r镜像加速器配置：\rsudo mkdir -p /etc/docker\rsudo tee /etc/docker/daemon.json &lt;&lt;-'EOF'\r{\r&quot;registry-mirrors&quot;: [\r&quot;https://registry.dockermirror.com&quot;,\r&quot;阿里镜像&quot;,\r&quot;https://docker.nju.edu.cn&quot;,\r&quot;https://hub.littlediary.cn&quot;,\r&quot;https://hub.xdark.top&quot;,\r&quot;https://dockerpull.org&quot;,\r&quot;https://hub.crdz.gq&quot;,\r&quot;https://docker.1panel.live&quot;,\r&quot;https://docker.unsee.tech&quot;\r]\r}\rEOF\rsudo systemctl daemon-reload\rsudo systemctl restart docker\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r删除镜像\r# 删除单个镜像(-f 强制删除)：\rdocker rmi -f 镜像ID\rdocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t3.停止容器、启动容器、重启容器\rdocker stop 容器名称或id\rdocker start 容器名称或id\rdocker restart 容器名称或id\r4.删除容器 （-f force）\rdocker rm -f 容器名称或id\r删除正在运行的容器是不允许的。可以先停止再删除 或 加 -f 强制删除。\rdocker rm spzx_mysql\rError response from daemon: cannot remove container &quot;/spzx_mysql&quot;: container is running: stop the container before removing or force remove\r5.登录容器\rdocker exec -it 容器名称 /bin/bash\r6.其他命令\rdocker logs -f 容器名称/容器的id\t# 查询容器内进程日志，-f参数表示实时监控日志信息 ctrl + c\rdocker inspect 容器名称/容器的id\t# 查看容器的详情信息\rdocker cp # 完成容器和宿主机之间的文件copy 容器即使停止也可以拷贝。\tdocker cp ./nginx.tar mycentos_01:/opt\tdocker cp mycentos_01:/opt/nginx.tar ./\r7.备份与迁移\rdocker commit 容器名称/容器的id 镜像名称\t# 把docker容器保存成一个镜像\rdocker save -o 镜像tar文件名称 镜像名称/镜像id\t# 把镜像保存为tar文件\rdocker load -i 镜像tar文件名称\t# 把tar文件恢复成为一个镜像\r数据卷\r数据卷就是将容器里的目录和宿主机目录进行映射。将容器里的目录数据备份到宿主机目录里。容器删除，容器里的数据没了。\r但是，重新创建容器，将容器里的目录跟宿主机目录进行挂载 ，数据就可以找回。(异地备份)\r关于数据卷的操作：\rdocker volume ls # 查看数据卷列表\rdocker volume create 数据卷名称 # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data docker volume inspect 数据卷名称 # 查看数据详情\rdocker volume rm 数据卷名称 # 删除指定的数据卷\r数据卷挂载：案例\rdocker run -d --name=redis01 -p 6380:6379 -v redis-data:/data redis:7.0.10\r目录挂载：案例\tdocker run -d --name redis02 -p 6381:6379 -v /redis-data:/data redis:7.0.10\rdockerfile\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 dockerfile就是一个编写相关指令的文本文件。通过这个文件可以创建想要的镜像。 阿里云公开镜像： 1. 登录阿里云Docker Registry $ docker login --username=yanjingkuang01 registry.cn-hangzhou.aliyuncs.com 用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。 您可以在访问凭证页面修改凭证密码。 2. 将镜像推送到Registry $ docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] $ docker push registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] 3. 从Registry中拉取镜像 $ docker pull registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] docker compose\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 Docker Compose作用：批量管理容器。 # 启动容器(如果不存在容器就创建、存在则修改) docker compose -f docker-compose.yml up -d # 删除所有容器 docker compose -f docker-compose.yml down # 停止所有容器 docker compose -f docker-compose.yml stop # 启动所有容器 docker compose -f docker-compose.yml start # 重启所有容器 docker compose -f docker-compose.yml restart ">
+<meta property='og:url' content='https://z221224.github.io/yuan/p/docker%E5%85%A5%E9%97%A8/'>
+<meta property='og:site_name' content='米 粒'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-06T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-01-06T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="docker入门">
+<meta name="twitter:description" content="Docker介绍\rDocker作用：\r解决环境差异，引发不兼容问题。\r快速搭建环境，快速水平扩展(集群)\r一次构建，应用到处运行。\rdocker 是一个开源的应用容器引擎，基于 Go 语言开发。\r好处：\r可移植性\r可伸缩\r隔离性\r资源利用率高\r镜像加速器配置：\rsudo mkdir -p /etc/docker\rsudo tee /etc/docker/daemon.json &lt;&lt;-'EOF'\r{\r&quot;registry-mirrors&quot;: [\r&quot;https://registry.dockermirror.com&quot;,\r&quot;阿里镜像&quot;,\r&quot;https://docker.nju.edu.cn&quot;,\r&quot;https://hub.littlediary.cn&quot;,\r&quot;https://hub.xdark.top&quot;,\r&quot;https://dockerpull.org&quot;,\r&quot;https://hub.crdz.gq&quot;,\r&quot;https://docker.1panel.live&quot;,\r&quot;https://docker.unsee.tech&quot;\r]\r}\rEOF\rsudo systemctl daemon-reload\rsudo systemctl restart docker\r镜像常用命令\r查看镜像：\r中央仓库连接不上。进行 【docker search 镜像名称】 会报超时问题。暂时不管或科学上网。\rdocker search redis\rError response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout\r拉取镜像(下载)\rdocker pull 镜像名称[:tag] 如果不指定版本号，表示下载最新版本\r删除镜像\r# 删除单个镜像(-f 强制删除)：\rdocker rmi -f 镜像ID\rdocker rmi -f $(docker images -q)\t# 慎用 根据id删除所有镜像\r帮助命令：\r哪里命令不会，就在哪个命令后面增加--help查询帮助文档。\rdocker images --help\rdocker xxx --help\r容器常用命令\r1.查询容器\rdocker ps 只查看正在运行的容器\rdocker ps -a\t正在运行的容器以及停止的容器\tdocker ps -q\t只查看正在运行的容器id\rdocker ps -aq\t查看正在运行的容器以及停止的容器的id\r2.创建容器\r-i：表示运行容器\r-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。\r--name :为创建的容器命名。\r-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。\r1.创建交换式容器\rdocker run -it --name=mycentos centos:7 /bin/bash\t交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。\rexit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。\r2.创建守护式容器\rdocker run -id --name=mycentos centos:7\t3.停止容器、启动容器、重启容器\rdocker stop 容器名称或id\rdocker start 容器名称或id\rdocker restart 容器名称或id\r4.删除容器 （-f force）\rdocker rm -f 容器名称或id\r删除正在运行的容器是不允许的。可以先停止再删除 或 加 -f 强制删除。\rdocker rm spzx_mysql\rError response from daemon: cannot remove container &quot;/spzx_mysql&quot;: container is running: stop the container before removing or force remove\r5.登录容器\rdocker exec -it 容器名称 /bin/bash\r6.其他命令\rdocker logs -f 容器名称/容器的id\t# 查询容器内进程日志，-f参数表示实时监控日志信息 ctrl + c\rdocker inspect 容器名称/容器的id\t# 查看容器的详情信息\rdocker cp # 完成容器和宿主机之间的文件copy 容器即使停止也可以拷贝。\tdocker cp ./nginx.tar mycentos_01:/opt\tdocker cp mycentos_01:/opt/nginx.tar ./\r7.备份与迁移\rdocker commit 容器名称/容器的id 镜像名称\t# 把docker容器保存成一个镜像\rdocker save -o 镜像tar文件名称 镜像名称/镜像id\t# 把镜像保存为tar文件\rdocker load -i 镜像tar文件名称\t# 把tar文件恢复成为一个镜像\r数据卷\r数据卷就是将容器里的目录和宿主机目录进行映射。将容器里的目录数据备份到宿主机目录里。容器删除，容器里的数据没了。\r但是，重新创建容器，将容器里的目录跟宿主机目录进行挂载 ，数据就可以找回。(异地备份)\r关于数据卷的操作：\rdocker volume ls # 查看数据卷列表\rdocker volume create 数据卷名称 # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data docker volume inspect 数据卷名称 # 查看数据详情\rdocker volume rm 数据卷名称 # 删除指定的数据卷\r数据卷挂载：案例\rdocker run -d --name=redis01 -p 6380:6379 -v redis-data:/data redis:7.0.10\r目录挂载：案例\tdocker run -d --name redis02 -p 6381:6379 -v /redis-data:/data redis:7.0.10\rdockerfile\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 dockerfile就是一个编写相关指令的文本文件。通过这个文件可以创建想要的镜像。 阿里云公开镜像： 1. 登录阿里云Docker Registry $ docker login --username=yanjingkuang01 registry.cn-hangzhou.aliyuncs.com 用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。 您可以在访问凭证页面修改凭证密码。 2. 将镜像推送到Registry $ docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] $ docker push registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] 3. 从Registry中拉取镜像 $ docker pull registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号] docker compose\r1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 Docker Compose作用：批量管理容器。 # 启动容器(如果不存在容器就创建、存在则修改) docker compose -f docker-compose.yml up -d # 删除所有容器 docker compose -f docker-compose.yml down # 停止所有容器 docker compose -f docker-compose.yml stop # 启动所有容器 docker compose -f docker-compose.yml start # 重启所有容器 docker compose -f docker-compose.yml restart ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/yuan/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/yuan/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🕸️</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/yuan">米 粒</a></h1>
+            <h2 class="site-description">你感到痛苦，是因为你在成长</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://www.bilibili.com/'
+                        target="_blank"
+                        title="bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/z221224'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/yuan/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#docker介绍">Docker介绍</a></li>
+    <li><a href="#镜像常用命令">镜像常用命令</a></li>
+    <li><a href="#容器常用命令">容器常用命令</a></li>
+    <li><a href="#数据卷">数据卷</a></li>
+    <li><a href="#dockerfile">dockerfile</a></li>
+    <li><a href="#docker-compose">docker compose</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/yuan/categories/docker/" >
+                Docker
+            </a>
+        
+            <a href="/yuan/categories/%E5%85%A5%E9%97%A8/" >
+                入门
+            </a>
+        
+            <a href="/yuan/categories/docker%E5%91%BD%E4%BB%A4/" >
+                Docker命令
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/yuan/p/docker%E5%85%A5%E9%97%A8/">docker入门</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-01-06</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 2 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="docker介绍">Docker介绍
+</h2><pre><code>Docker作用：
+	解决环境差异，引发不兼容问题。
+	快速搭建环境，快速水平扩展(集群)
+	
+	一次构建，应用到处运行。
+
+docker 是一个开源的应用容器引擎，基于 Go 语言开发。
+	好处：
+			可移植性
+			可伸缩
+			隔离性
+			资源利用率高
+			
+镜像加速器配置：
+sudo mkdir -p /etc/docker
+		sudo tee /etc/docker/daemon.json &lt;&lt;-'EOF'
+			{
+			  &quot;registry-mirrors&quot;: [
+
+					&quot;https://registry.dockermirror.com&quot;,
+				
+					&quot;阿里镜像&quot;,
+				
+					&quot;https://docker.nju.edu.cn&quot;,
+
+					&quot;https://hub.littlediary.cn&quot;,
+
+					&quot;https://hub.xdark.top&quot;,
+
+					&quot;https://dockerpull.org&quot;,
+
+					&quot;https://hub.crdz.gq&quot;,
+
+					&quot;https://docker.1panel.live&quot;,
+
+					&quot;https://docker.unsee.tech&quot;
+					
+					]
+			}
+		EOF
+		sudo systemctl daemon-reload
+		sudo systemctl restart docker
+</code></pre>
+<h2 id="镜像常用命令">镜像常用命令
+</h2><pre><code>查看镜像：
+
+	中央仓库连接不上。进行  【docker search 镜像名称】   会报超时问题。暂时不管或科学上网。
+	docker search redis
+	Error response from daemon: Get &quot;https://index.docker.io/v1/search?q=redis&amp;n=25&quot;: net/http: TLS handshake timeout
+
+拉取镜像(下载)
+	docker pull 镜像名称[:tag]    如果不指定版本号，表示下载最新版本
+	
+	删除镜像
+		# 删除单个镜像(-f 强制删除)：
+		docker rmi  -f 镜像ID
+		
+		docker rmi -f $(docker images -q)	# 慎用  根据id删除所有镜像
+
+帮助命令：
+	哪里命令不会，就在哪个命令后面增加--help查询帮助文档。
+	docker images --help
+	docker xxx --help
+</code></pre>
+<h2 id="容器常用命令">容器常用命令
+</h2><pre><code>1.查询容器
+	docker ps           只查看正在运行的容器
+	docker ps -a		正在运行的容器以及停止的容器	
+	docker ps -q		只查看正在运行的容器id
+	docker ps -aq		查看正在运行的容器以及停止的容器的id
+
+2.创建容器
+
+	-i：表示运行容器
+	-t：表示容器启动后会进入其命令行。加入这两个参数后，容器创建就能登录进去。即分配一个伪终端。
+	--name :为创建的容器命名。
+	-d：在run后面加上-d参数,则会创建一个守护式容器在后台运行（这样创建容器后不会自动登录容器，如果只加-i -t两个参数，创建后就会自动进去容器）。
+
+	1.创建交换式容器
+		docker run -it --name=mycentos centos:7 /bin/bash	
+		交互式容器一旦创建成功(创建+启动)，那么，直接进入容器内部(每一个容器都是一个最小型虚拟机)。
+		exit 首次退出会停止容器。重新启动容器后登录，再退出。容器就不会停止。
+	2.创建守护式容器
+		docker run -id --name=mycentos centos:7	
+	3.停止容器、启动容器、重启容器
+		docker stop 容器名称或id
+		docker start 容器名称或id
+		docker restart 容器名称或id
+
+4.删除容器 （-f    force）
+	docker rm -f 容器名称或id
+	
+		删除正在运行的容器是不允许的。可以先停止再删除  或  加 -f 强制删除。
+		docker rm spzx_mysql
+		Error response from daemon: cannot remove container &quot;/spzx_mysql&quot;: container is running: stop the container before removing or force remove
+
+5.登录容器
+	docker exec -it 容器名称 /bin/bash
+
+6.其他命令
+	docker logs -f 容器名称/容器的id	# 查询容器内进程日志，-f参数表示实时监控日志信息     ctrl + c
+	docker inspect 容器名称/容器的id	# 查看容器的详情信息
+	docker cp 						 # 完成容器和宿主机之间的文件copy    容器即使停止也可以拷贝。	
+		
+		docker cp ./nginx.tar  mycentos_01:/opt			
+		docker cp mycentos_01:/opt/nginx.tar ./
+
+7.备份与迁移
+
+	docker commit 容器名称/容器的id 镜像名称		 # 把docker容器保存成一个镜像
+	docker save -o 镜像tar文件名称 镜像名称/镜像id	# 把镜像保存为tar文件
+	docker load -i 镜像tar文件名称				# 把tar文件恢复成为一个镜像
+</code></pre>
+<h2 id="数据卷">数据卷
+</h2><pre><code>数据卷就是将容器里的目录和宿主机目录进行映射。将容器里的目录数据备份到宿主机目录里。容器删除，容器里的数据没了。
+但是，重新创建容器，将容器里的目录跟宿主机目录进行挂载 ，数据就可以找回。(异地备份)
+
+关于数据卷的操作：
+	docker volume ls                    # 查看数据卷列表
+	docker volume create 数据卷名称      # 创建数据卷生成的宿主机上的物理路径： /var/lib/docker/volumes/数据卷名称/_data    
+	docker volume inspect 数据卷名称     # 查看数据详情
+	docker volume rm 数据卷名称          # 删除指定的数据卷
+
+数据卷挂载：案例
+	docker run -d --name=redis01 -p 6380:6379 -v redis-data:/data redis:7.0.10
+	
+目录挂载：案例	
+	docker run -d --name redis02 -p 6381:6379 -v /redis-data:/data redis:7.0.10
+</code></pre>
+<h2 id="dockerfile">dockerfile
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">dockerfile就是一个编写相关指令的文本文件。通过这个文件可以创建想要的镜像。
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	阿里云公开镜像：
+</span></span><span class="line"><span class="cl">		1. 登录阿里云Docker Registry
+</span></span><span class="line"><span class="cl">		$ docker login --username=yanjingkuang01 registry.cn-hangzhou.aliyuncs.com
+</span></span><span class="line"><span class="cl">		用于登录的用户名为阿里云账号全名，密码为开通服务时设置的密码。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		您可以在访问凭证页面修改凭证密码。
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		2. 将镜像推送到Registry
+</span></span><span class="line"><span class="cl">		$ docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号]
+</span></span><span class="line"><span class="cl">		$ docker push registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号]
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		3. 从Registry中拉取镜像
+</span></span><span class="line"><span class="cl">		$ docker pull registry.cn-hangzhou.aliyuncs.com/docker_xxx/centos7_jdk17:[镜像版本号]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="docker-compose">docker compose
+</h2><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">Docker Compose作用：批量管理容器。
+</span></span><span class="line"><span class="cl">		# 启动容器(如果不存在容器就创建、存在则修改)
+</span></span><span class="line"><span class="cl">		docker compose -f docker-compose.yml up -d
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		# 删除所有容器
+</span></span><span class="line"><span class="cl">		docker compose -f docker-compose.yml down
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		# 停止所有容器
+</span></span><span class="line"><span class="cl">		docker compose -f docker-compose.yml stop
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		# 启动所有容器
+</span></span><span class="line"><span class="cl">		docker compose -f docker-compose.yml start
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		# 重启所有容器
+</span></span><span class="line"><span class="cl">		docker compose -f docker-compose.yml restart
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 米饭能吃饱
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/yuan/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
