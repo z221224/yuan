@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>线程 on 米 粒</title>
+        <link>https://z221224.github.io/yuan/categories/%E7%BA%BF%E7%A8%8B/</link>
+        <description>Recent content in 线程 on 米 粒</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <copyright>米饭能吃饱</copyright>
+        <lastBuildDate>Thu, 09 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/categories/%E7%BA%BF%E7%A8%8B/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>juc相关</title>
+        <link>https://z221224.github.io/yuan/p/juc%E7%9B%B8%E5%85%B3/</link>
+        <pubDate>Thu, 09 Jan 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/p/juc%E7%9B%B8%E5%85%B3/</guid>
+        <description>&lt;h2 id=&#34;说说线程的状态&#34;&gt;说说线程的状态？
+&lt;/h2&gt;&lt;p&gt;​	新建（New）：线程被创建但尚未启动执行。&lt;/p&gt;
+&lt;p&gt;​	就绪（Runnable）：线程等待CPU时间片以便执行，也就是处于就绪状态。&lt;/p&gt;
+&lt;p&gt;​	阻塞（Blocked）：线程暂停执行，通常是因为等待某些条件满足，例如等待I/O操作完成、等待锁释放等。&lt;/p&gt;
+&lt;p&gt;​	无限期等待（Waiting）：线程无限期地等待某个条件的发生，通常需要其他线程来唤醒它。&lt;/p&gt;
+&lt;p&gt;​	有限期等待（Timed Waiting）：线程等待一段时间，超过指定时间后会自动唤醒。&lt;/p&gt;
+&lt;p&gt;​	终止（Terminated）：线程执行完成或者异常终止，进入终止状态。&lt;/p&gt;
+&lt;h2 id=&#34;线程创建方式有哪些&#34;&gt;线程创建方式有哪些?
+&lt;/h2&gt;&lt;p&gt;​	继承Thread抽象类&lt;/p&gt;
+&lt;p&gt;​	实现Runnable接口&lt;/p&gt;
+&lt;p&gt;​	实现Callable接口&lt;/p&gt;
+&lt;p&gt;​	通过ThreadPoolExecutor线程池&lt;/p&gt;
+&lt;h2 id=&#34;并发安全集合类都哪些&#34;&gt;并发安全集合类都哪些？
+&lt;/h2&gt;&lt;p&gt;​    ConcurrentHashMap 是线程安全的哈希表实现,它通过分段锁的机制来实现并发访问的高效性。
+​    CopyOnWriteArrayList 是线程安全的 List 实现，它通过复制底层数组的方式保证线程安全，适用于读多写少的场景。&lt;/p&gt;
+&lt;p&gt;​    CopyOnWriteArraySet 是 CopyOnWriteArrayList 的 Set 版本&lt;/p&gt;
+&lt;p&gt;​    BlockingQueue 是一个用于在多线程间传递数据的队列接口,它包含多个实现类，如 ArrayBlockingQueue、LinkedBlockingQueue&lt;/p&gt;
+&lt;h2 id=&#34;如何创建线程池说说7个参数和线程池工作原理&#34;&gt;如何创建线程池？说说7个参数和线程池工作原理?
+&lt;/h2&gt;&lt;p&gt;​    使用Executors工厂&lt;/p&gt;
+&lt;p&gt;​    使用ThreadPoolExecutor构造函数&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;ThreadPoolExecutor的七个参数:
+	corePoolSize（核心池大小）不会被回收
+	maximumPoolSize（最大池大小）会被回收
+	keepAliveTime（线程空闲存活时间）
+	unit（时间单位）
+	workQueue（工作队列）
+		LinkedBlockingQueue大小无限制
+		ArrayBlockingQueue大小有限，必须指定容量
+		SynchronousQueue不存储任务,直接给线程池
+	threadFactory（线程工厂）
+	handler（拒绝策略）
+		AbortPolicy: 直接抛出异常
+		CallerRunsPolicy：返回给调用者线程执行该任务
+		DiscardPolicy：直接丢弃该任务
+		DiscardOldestPolicy：丢弃最旧的一个任务
+工作原理:
+	提交新任务时,线程池进行判断是否有空闲线程,有就直接执行,没有就查看是否到达核心线程数,没有就创建新的线程执行,
+	如果达到核心线程数但任务队列有空间,进入任务队列,
+	如果任务队列也已经满了,查看是否到达最大线程数,没有到达最大线程数就创建新的线程,若到达最大线程数,执行拒绝策略
+	当队列中的任务执行完,线程空闲时间到达预设时间,销毁超出核心线程数的线程
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;jmm模型特性有哪些如何保证这些特性&#34;&gt;JMM模型特性有哪些？如何保证这些特性?
+&lt;/h2&gt;&lt;p&gt;​    可见性&lt;/p&gt;
+&lt;p&gt;​			使用 volatile关键字声明变量,确保修改对于所有线程立即可见&lt;/p&gt;
+&lt;p&gt;有序性&lt;/p&gt;
+&lt;p&gt;volatile 保证对该变量的读写操作是有序的，禁止重排序。&lt;/p&gt;
+&lt;p&gt;​    原子性
+​&lt;/p&gt;
+&lt;p&gt;synchronized同步锁确保对共享变量的操作是原子的。&lt;/p&gt;
+&lt;p&gt;​		atomic提供的原子类AtomicInteger、AtomicLong等&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
