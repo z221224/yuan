@@ -7,7 +7,92 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <copyright>米饭能吃饱</copyright>
-        <lastBuildDate>Thu, 09 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/categories/java/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 14 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://z221224.github.io/yuan/categories/java/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>redis缓存常见问题</title>
+        <link>https://z221224.github.io/yuan/p/redis%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</link>
+        <pubDate>Tue, 14 Jan 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/p/redis%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</guid>
+        <description>&lt;h2 id=&#34;缓存常见问题&#34;&gt;缓存常见问题
+&lt;/h2&gt;&lt;p&gt;缓存最常见的4个问题： 面试&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;缓存穿透&lt;/li&gt;
+&lt;li&gt;缓存雪崩&lt;/li&gt;
+&lt;li&gt;缓存击穿&lt;/li&gt;
+&lt;li&gt;数据一致性&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;缓存穿透&#34;&gt;缓存穿透
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;缓存穿透&lt;/strong&gt;: 是指查询一个不存在的数据，由于缓存无法命中，将去查询数据库，但是数据库也无此记录，并且出于容错考虑，我们没有将这次查询的null写入缓存，这将导致这个不存在的数据每次请求都要到存储层去查询，失去了缓存的意义。在流量大时，可能DB就挂掉了，要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;解决1 ：空结果也进行缓存，但它的过期时间会很短，最长不超过五分钟，但是不能防止随机穿透。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;解决2 ：使用布隆过滤器或者Redis的Bitmap来解决随机穿透问题&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;缓存雪崩&#34;&gt;缓存雪崩
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;缓存雪崩&lt;/strong&gt;:是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时压力过重雪崩。&lt;/p&gt;
+&lt;p&gt;解决1：&lt;/p&gt;
+&lt;p&gt;原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。&lt;/p&gt;
+&lt;p&gt;解决2：&lt;/p&gt;
+&lt;p&gt;如果单节点宕机，可以采用集群部署方式防止雪崩&lt;/p&gt;
+&lt;h2 id=&#34;缓存击穿&#34;&gt;缓存击穿
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;缓存击穿&lt;/strong&gt;: 是指对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：如果这个key在大量请求同时进来之前正好失效，那么所有对这个key的数据查询都落到db，我们称为缓存击穿。&lt;/p&gt;
+&lt;h3 id=&#34;与缓存雪崩的区别&#34;&gt;与缓存雪崩的区别：
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;击穿是一个热点key失效&lt;/li&gt;
+&lt;li&gt;雪崩是很多key集体失效&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;解决分布式锁&#34;&gt;解决：分布式锁
+&lt;/h3&gt;&lt;h2 id=&#34;数据一致性问题&#34;&gt;数据一致性问题
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;数据一致性&lt;/strong&gt;：在当前环境下，通常我们会首选redis缓存来减轻我们数据库访问压力。但是也会遇到以下这种情况：大量用户来访问我们系统，首先会去查询缓存， 如果缓存中没有数据，则去查询数据库，然后更新数据到缓存中，并且如果数据库中的数据发生了改变则需要同步到redis中，同步过程中需要保证 MySQL与redis数据一致性问题&lt;/p&gt;
+&lt;h3 id=&#34;解决1使用延时双删策略&#34;&gt;解决1：使用延时双删策略
+&lt;/h3&gt;&lt;p&gt;延时双删策略是一种常见的保证MySQL和Redis数据一致性的方法。其主要流程包括：先删除缓存，然后更新数据库。这个过程完成后，大约在数据库从库更新后再次删除缓存。具体的步骤如下：&lt;/p&gt;
+&lt;p&gt;第一步，先执行redis.del(key)操作删除缓存；&lt;/p&gt;
+&lt;p&gt;第二步，然后执行写数据库的操作；&lt;/p&gt;
+&lt;p&gt;第三步，休眠一段时间（例如500毫秒），根据具体的业务时间来定；&lt;/p&gt;
+&lt;p&gt;第四步，再次执行redis.del(key)操作删除缓存。&lt;/p&gt;
+&lt;p&gt;延时双删策略通过这种方式尝试达到最终的数据一致性，但是这并不是强一致性，因为MySQL和Redis主从节点数据的同步并不是实时的，所以需要等待一段时间以增强它们的数据一致性。同时，由于读写是并发的，可能出现缓存和数据库数据不一致的问题&lt;/p&gt;
+&lt;h3 id=&#34;解决2使用canal解决&#34;&gt;解决2：使用canal解决
+&lt;/h3&gt;&lt;h2 id=&#34;分布式锁&#34;&gt;分布式锁
+&lt;/h2&gt;&lt;p&gt;分布式锁主流的实现方案：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;基于数据库实现分布式锁&lt;/li&gt;
+&lt;li&gt;基于缓存（ Redis等）&lt;/li&gt;
+&lt;li&gt;基于Zookeeper&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;每一种分布式锁解决方案都有各自的优缺点：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;高性能：Redis最高&lt;/li&gt;
+&lt;li&gt;可靠性：zookeeper最高&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;分布式锁的关键是&lt;strong&gt;多进程共享的内存标记(锁)&lt;/strong&gt;，因此只要我们在Redis中放置一个这样的标记(数据)就可以了。不过在实现过程中，不要忘了我们需要实现下列目标：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;多进程可见&lt;/strong&gt;：多进程可见，否则就无法实现分布式效果&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;避免死锁&lt;/strong&gt;：死锁的情况有很多，我们要思考各种异常导致死锁的情况，保证锁可以被释放&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;排它&lt;/strong&gt;：同一时刻，只能有一个进程获得锁&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高可用&lt;/strong&gt;：避免锁服务宕机或处理好宕机的补救措施(redis集群架构：1.主从复制 2.哨兵 3.cluster集群)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;小总结：&lt;/p&gt;
+&lt;p&gt;为了确保分布式锁可用，至少要确保锁的实现同时满足以下几个条件：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;互斥性。在任意时刻，只有一个客户端能持有锁。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;解铃还须系铃人。加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;加锁和解锁必须具有原子性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
         <title>juc</title>
         <link>https://z221224.github.io/yuan/p/juc/</link>
         <pubDate>Thu, 09 Jan 2025 00:00:00 +0000</pubDate>

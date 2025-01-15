@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="zh-cn" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="缓存常见问题\r缓存最常见的4个问题： 面试\n缓存穿透 缓存雪崩 缓存击穿 数据一致性 缓存穿透\r缓存穿透: 是指查询一个不存在的数据，由于缓存无法命中，将去查询数据库，但是数据库也无此记录，并且出于容错考虑，我们没有将这次查询的null写入缓存，这将导致这个不存在的数据每次请求都要到存储层去查询，失去了缓存的意义。在流量大时，可能DB就挂掉了，要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。\n解决1 ：空结果也进行缓存，但它的过期时间会很短，最长不超过五分钟，但是不能防止随机穿透。\n解决2 ：使用布隆过滤器或者Redis的Bitmap来解决随机穿透问题\n缓存雪崩\r缓存雪崩:是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时压力过重雪崩。\n解决1：\n原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。\n解决2：\n如果单节点宕机，可以采用集群部署方式防止雪崩\n缓存击穿\r缓存击穿: 是指对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：如果这个key在大量请求同时进来之前正好失效，那么所有对这个key的数据查询都落到db，我们称为缓存击穿。\n与缓存雪崩的区别：\r击穿是一个热点key失效 雪崩是很多key集体失效 解决：分布式锁\r数据一致性问题\r数据一致性：在当前环境下，通常我们会首选redis缓存来减轻我们数据库访问压力。但是也会遇到以下这种情况：大量用户来访问我们系统，首先会去查询缓存， 如果缓存中没有数据，则去查询数据库，然后更新数据到缓存中，并且如果数据库中的数据发生了改变则需要同步到redis中，同步过程中需要保证 MySQL与redis数据一致性问题\n解决1：使用延时双删策略\r延时双删策略是一种常见的保证MySQL和Redis数据一致性的方法。其主要流程包括：先删除缓存，然后更新数据库。这个过程完成后，大约在数据库从库更新后再次删除缓存。具体的步骤如下：\n第一步，先执行redis.del(key)操作删除缓存；\n第二步，然后执行写数据库的操作；\n第三步，休眠一段时间（例如500毫秒），根据具体的业务时间来定；\n第四步，再次执行redis.del(key)操作删除缓存。\n延时双删策略通过这种方式尝试达到最终的数据一致性，但是这并不是强一致性，因为MySQL和Redis主从节点数据的同步并不是实时的，所以需要等待一段时间以增强它们的数据一致性。同时，由于读写是并发的，可能出现缓存和数据库数据不一致的问题\n解决2：使用canal解决\r分布式锁\r分布式锁主流的实现方案：\n基于数据库实现分布式锁 基于缓存（ Redis等） 基于Zookeeper 每一种分布式锁解决方案都有各自的优缺点：\n高性能：Redis最高 可靠性：zookeeper最高 分布式锁的关键是多进程共享的内存标记(锁)，因此只要我们在Redis中放置一个这样的标记(数据)就可以了。不过在实现过程中，不要忘了我们需要实现下列目标：\n多进程可见：多进程可见，否则就无法实现分布式效果 避免死锁：死锁的情况有很多，我们要思考各种异常导致死锁的情况，保证锁可以被释放 排它：同一时刻，只能有一个进程获得锁 高可用：避免锁服务宕机或处理好宕机的补救措施(redis集群架构：1.主从复制 2.哨兵 3.cluster集群) 小总结：\n为了确保分布式锁可用，至少要确保锁的实现同时满足以下几个条件：\n互斥性。在任意时刻，只有一个客户端能持有锁。\n不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。\n解铃还须系铃人。加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。\n加锁和解锁必须具有原子性。\n">
+<title>redis缓存常见问题</title>
+
+<link rel='canonical' href='https://z221224.github.io/yuan/p/redis%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/'>
+
+<link rel="stylesheet" href="/yuan/scss/style.min.b9c8156d464c343bdacaf14a871581fb94cbbdb9dd5cbce4ba017361187cc930.css"><meta property='og:title' content="redis缓存常见问题">
+<meta property='og:description' content="缓存常见问题\r缓存最常见的4个问题： 面试\n缓存穿透 缓存雪崩 缓存击穿 数据一致性 缓存穿透\r缓存穿透: 是指查询一个不存在的数据，由于缓存无法命中，将去查询数据库，但是数据库也无此记录，并且出于容错考虑，我们没有将这次查询的null写入缓存，这将导致这个不存在的数据每次请求都要到存储层去查询，失去了缓存的意义。在流量大时，可能DB就挂掉了，要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。\n解决1 ：空结果也进行缓存，但它的过期时间会很短，最长不超过五分钟，但是不能防止随机穿透。\n解决2 ：使用布隆过滤器或者Redis的Bitmap来解决随机穿透问题\n缓存雪崩\r缓存雪崩:是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时压力过重雪崩。\n解决1：\n原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。\n解决2：\n如果单节点宕机，可以采用集群部署方式防止雪崩\n缓存击穿\r缓存击穿: 是指对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：如果这个key在大量请求同时进来之前正好失效，那么所有对这个key的数据查询都落到db，我们称为缓存击穿。\n与缓存雪崩的区别：\r击穿是一个热点key失效 雪崩是很多key集体失效 解决：分布式锁\r数据一致性问题\r数据一致性：在当前环境下，通常我们会首选redis缓存来减轻我们数据库访问压力。但是也会遇到以下这种情况：大量用户来访问我们系统，首先会去查询缓存， 如果缓存中没有数据，则去查询数据库，然后更新数据到缓存中，并且如果数据库中的数据发生了改变则需要同步到redis中，同步过程中需要保证 MySQL与redis数据一致性问题\n解决1：使用延时双删策略\r延时双删策略是一种常见的保证MySQL和Redis数据一致性的方法。其主要流程包括：先删除缓存，然后更新数据库。这个过程完成后，大约在数据库从库更新后再次删除缓存。具体的步骤如下：\n第一步，先执行redis.del(key)操作删除缓存；\n第二步，然后执行写数据库的操作；\n第三步，休眠一段时间（例如500毫秒），根据具体的业务时间来定；\n第四步，再次执行redis.del(key)操作删除缓存。\n延时双删策略通过这种方式尝试达到最终的数据一致性，但是这并不是强一致性，因为MySQL和Redis主从节点数据的同步并不是实时的，所以需要等待一段时间以增强它们的数据一致性。同时，由于读写是并发的，可能出现缓存和数据库数据不一致的问题\n解决2：使用canal解决\r分布式锁\r分布式锁主流的实现方案：\n基于数据库实现分布式锁 基于缓存（ Redis等） 基于Zookeeper 每一种分布式锁解决方案都有各自的优缺点：\n高性能：Redis最高 可靠性：zookeeper最高 分布式锁的关键是多进程共享的内存标记(锁)，因此只要我们在Redis中放置一个这样的标记(数据)就可以了。不过在实现过程中，不要忘了我们需要实现下列目标：\n多进程可见：多进程可见，否则就无法实现分布式效果 避免死锁：死锁的情况有很多，我们要思考各种异常导致死锁的情况，保证锁可以被释放 排它：同一时刻，只能有一个进程获得锁 高可用：避免锁服务宕机或处理好宕机的补救措施(redis集群架构：1.主从复制 2.哨兵 3.cluster集群) 小总结：\n为了确保分布式锁可用，至少要确保锁的实现同时满足以下几个条件：\n互斥性。在任意时刻，只有一个客户端能持有锁。\n不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。\n解铃还须系铃人。加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。\n加锁和解锁必须具有原子性。\n">
+<meta property='og:url' content='https://z221224.github.io/yuan/p/redis%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/'>
+<meta property='og:site_name' content='米 粒'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:published_time' content='2025-01-14T00:00:00&#43;00:00'/><meta property='article:modified_time' content='2025-01-14T00:00:00&#43;00:00'/>
+<meta name="twitter:title" content="redis缓存常见问题">
+<meta name="twitter:description" content="缓存常见问题\r缓存最常见的4个问题： 面试\n缓存穿透 缓存雪崩 缓存击穿 数据一致性 缓存穿透\r缓存穿透: 是指查询一个不存在的数据，由于缓存无法命中，将去查询数据库，但是数据库也无此记录，并且出于容错考虑，我们没有将这次查询的null写入缓存，这将导致这个不存在的数据每次请求都要到存储层去查询，失去了缓存的意义。在流量大时，可能DB就挂掉了，要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。\n解决1 ：空结果也进行缓存，但它的过期时间会很短，最长不超过五分钟，但是不能防止随机穿透。\n解决2 ：使用布隆过滤器或者Redis的Bitmap来解决随机穿透问题\n缓存雪崩\r缓存雪崩:是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时压力过重雪崩。\n解决1：\n原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。\n解决2：\n如果单节点宕机，可以采用集群部署方式防止雪崩\n缓存击穿\r缓存击穿: 是指对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：如果这个key在大量请求同时进来之前正好失效，那么所有对这个key的数据查询都落到db，我们称为缓存击穿。\n与缓存雪崩的区别：\r击穿是一个热点key失效 雪崩是很多key集体失效 解决：分布式锁\r数据一致性问题\r数据一致性：在当前环境下，通常我们会首选redis缓存来减轻我们数据库访问压力。但是也会遇到以下这种情况：大量用户来访问我们系统，首先会去查询缓存， 如果缓存中没有数据，则去查询数据库，然后更新数据到缓存中，并且如果数据库中的数据发生了改变则需要同步到redis中，同步过程中需要保证 MySQL与redis数据一致性问题\n解决1：使用延时双删策略\r延时双删策略是一种常见的保证MySQL和Redis数据一致性的方法。其主要流程包括：先删除缓存，然后更新数据库。这个过程完成后，大约在数据库从库更新后再次删除缓存。具体的步骤如下：\n第一步，先执行redis.del(key)操作删除缓存；\n第二步，然后执行写数据库的操作；\n第三步，休眠一段时间（例如500毫秒），根据具体的业务时间来定；\n第四步，再次执行redis.del(key)操作删除缓存。\n延时双删策略通过这种方式尝试达到最终的数据一致性，但是这并不是强一致性，因为MySQL和Redis主从节点数据的同步并不是实时的，所以需要等待一段时间以增强它们的数据一致性。同时，由于读写是并发的，可能出现缓存和数据库数据不一致的问题\n解决2：使用canal解决\r分布式锁\r分布式锁主流的实现方案：\n基于数据库实现分布式锁 基于缓存（ Redis等） 基于Zookeeper 每一种分布式锁解决方案都有各自的优缺点：\n高性能：Redis最高 可靠性：zookeeper最高 分布式锁的关键是多进程共享的内存标记(锁)，因此只要我们在Redis中放置一个这样的标记(数据)就可以了。不过在实现过程中，不要忘了我们需要实现下列目标：\n多进程可见：多进程可见，否则就无法实现分布式效果 避免死锁：死锁的情况有很多，我们要思考各种异常导致死锁的情况，保证锁可以被释放 排它：同一时刻，只能有一个进程获得锁 高可用：避免锁服务宕机或处理好宕机的补救措施(redis集群架构：1.主从复制 2.哨兵 3.cluster集群) 小总结：\n为了确保分布式锁可用，至少要确保锁的实现同时满足以下几个条件：\n互斥性。在任意时刻，只有一个客户端能持有锁。\n不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。\n解铃还须系铃人。加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。\n加锁和解锁必须具有原子性。\n">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/yuan/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/yuan/img/avatar_hu13739649187745961479.png" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🕸️</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/yuan">米 粒</a></h1>
+            <h2 class="site-description">你感到痛苦，是因为你在成长</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://www.bilibili.com/'
+                        target="_blank"
+                        title="bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://github.com/z221224'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/yuan/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/yuan/%E9%93%BE%E6%8E%A5/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>暗色模式</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#缓存常见问题">缓存常见问题</a></li>
+    <li><a href="#缓存穿透">缓存穿透</a></li>
+    <li><a href="#缓存雪崩">缓存雪崩</a></li>
+    <li><a href="#缓存击穿">缓存击穿</a>
+      <ol>
+        <li><a href="#与缓存雪崩的区别">与缓存雪崩的区别：</a></li>
+        <li><a href="#解决分布式锁">解决：分布式锁</a></li>
+      </ol>
+    </li>
+    <li><a href="#数据一致性问题">数据一致性问题</a>
+      <ol>
+        <li><a href="#解决1使用延时双删策略">解决1：使用延时双删策略</a></li>
+        <li><a href="#解决2使用canal解决">解决2：使用canal解决</a></li>
+      </ol>
+    </li>
+    <li><a href="#分布式锁">分布式锁</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/yuan/categories/%E9%A2%98%E5%BA%93/" >
+                题库
+            </a>
+        
+            <a href="/yuan/categories/java/" >
+                Java
+            </a>
+        
+            <a href="/yuan/categories/redis/" >
+                Redis
+            </a>
+        
+            <a href="/yuan/categories/%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F/" >
+                缓存穿透
+            </a>
+        
+            <a href="/yuan/categories/%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF/" >
+                缓存击穿
+            </a>
+        
+            <a href="/yuan/categories/%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9/" >
+                缓存雪崩
+            </a>
+        
+            <a href="/yuan/categories/%E6%95%B0%E6%8D%AE%E4%B8%80%E8%87%B4%E6%80%A7/" >
+                数据一致性
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/yuan/p/redis%E7%BC%93%E5%AD%98%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">redis缓存常见问题</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">2025-01-14</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    阅读时长: 1 分钟
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="缓存常见问题">缓存常见问题
+</h2><p>缓存最常见的4个问题： 面试</p>
+<ol>
+<li>缓存穿透</li>
+<li>缓存雪崩</li>
+<li>缓存击穿</li>
+<li>数据一致性</li>
+</ol>
+<h2 id="缓存穿透">缓存穿透
+</h2><p><strong>缓存穿透</strong>: 是指查询一个不存在的数据，由于缓存无法命中，将去查询数据库，但是数据库也无此记录，并且出于容错考虑，我们没有将这次查询的null写入缓存，这将导致这个不存在的数据每次请求都要到存储层去查询，失去了缓存的意义。在流量大时，可能DB就挂掉了，要是有人利用不存在的key频繁攻击我们的应用，这就是漏洞。</p>
+<ul>
+<li>
+<p>解决1 ：空结果也进行缓存，但它的过期时间会很短，最长不超过五分钟，但是不能防止随机穿透。</p>
+</li>
+<li>
+<p>解决2 ：使用布隆过滤器或者Redis的Bitmap来解决随机穿透问题</p>
+</li>
+</ul>
+<h2 id="缓存雪崩">缓存雪崩
+</h2><p><strong>缓存雪崩</strong>:是指在我们设置缓存时采用了相同的过期时间，导致缓存在某一时刻同时失效，请求全部转发到DB，DB瞬时压力过重雪崩。</p>
+<p>解决1：</p>
+<p>原有的失效时间基础上增加一个随机值，比如1-5分钟随机，这样每一个缓存的过期时间的重复率就会降低，就很难引发集体失效的事件。</p>
+<p>解决2：</p>
+<p>如果单节点宕机，可以采用集群部署方式防止雪崩</p>
+<h2 id="缓存击穿">缓存击穿
+</h2><p><strong>缓存击穿</strong>: 是指对于一些设置了过期时间的key，如果这些key可能会在某些时间点被超高并发地访问，是一种非常“热点”的数据。这个时候，需要考虑一个问题：如果这个key在大量请求同时进来之前正好失效，那么所有对这个key的数据查询都落到db，我们称为缓存击穿。</p>
+<h3 id="与缓存雪崩的区别">与缓存雪崩的区别：
+</h3><ol>
+<li>击穿是一个热点key失效</li>
+<li>雪崩是很多key集体失效</li>
+</ol>
+<h3 id="解决分布式锁">解决：分布式锁
+</h3><h2 id="数据一致性问题">数据一致性问题
+</h2><p><strong>数据一致性</strong>：在当前环境下，通常我们会首选redis缓存来减轻我们数据库访问压力。但是也会遇到以下这种情况：大量用户来访问我们系统，首先会去查询缓存， 如果缓存中没有数据，则去查询数据库，然后更新数据到缓存中，并且如果数据库中的数据发生了改变则需要同步到redis中，同步过程中需要保证 MySQL与redis数据一致性问题</p>
+<h3 id="解决1使用延时双删策略">解决1：使用延时双删策略
+</h3><p>延时双删策略是一种常见的保证MySQL和Redis数据一致性的方法。其主要流程包括：先删除缓存，然后更新数据库。这个过程完成后，大约在数据库从库更新后再次删除缓存。具体的步骤如下：</p>
+<p>第一步，先执行redis.del(key)操作删除缓存；</p>
+<p>第二步，然后执行写数据库的操作；</p>
+<p>第三步，休眠一段时间（例如500毫秒），根据具体的业务时间来定；</p>
+<p>第四步，再次执行redis.del(key)操作删除缓存。</p>
+<p>延时双删策略通过这种方式尝试达到最终的数据一致性，但是这并不是强一致性，因为MySQL和Redis主从节点数据的同步并不是实时的，所以需要等待一段时间以增强它们的数据一致性。同时，由于读写是并发的，可能出现缓存和数据库数据不一致的问题</p>
+<h3 id="解决2使用canal解决">解决2：使用canal解决
+</h3><h2 id="分布式锁">分布式锁
+</h2><p>分布式锁主流的实现方案：</p>
+<ol>
+<li>基于数据库实现分布式锁</li>
+<li>基于缓存（ Redis等）</li>
+<li>基于Zookeeper</li>
+</ol>
+<p>每一种分布式锁解决方案都有各自的优缺点：</p>
+<ol>
+<li>高性能：Redis最高</li>
+<li>可靠性：zookeeper最高</li>
+</ol>
+<p>分布式锁的关键是<strong>多进程共享的内存标记(锁)</strong>，因此只要我们在Redis中放置一个这样的标记(数据)就可以了。不过在实现过程中，不要忘了我们需要实现下列目标：</p>
+<ul>
+<li><strong>多进程可见</strong>：多进程可见，否则就无法实现分布式效果</li>
+<li><strong>避免死锁</strong>：死锁的情况有很多，我们要思考各种异常导致死锁的情况，保证锁可以被释放</li>
+<li><strong>排它</strong>：同一时刻，只能有一个进程获得锁</li>
+<li><strong>高可用</strong>：避免锁服务宕机或处理好宕机的补救措施(redis集群架构：1.主从复制 2.哨兵 3.cluster集群)</li>
+</ul>
+<p>小总结：</p>
+<p>为了确保分布式锁可用，至少要确保锁的实现同时满足以下几个条件：</p>
+<ul>
+<li>
+<p>互斥性。在任意时刻，只有一个客户端能持有锁。</p>
+</li>
+<li>
+<p>不会发生死锁。即使有一个客户端在持有锁的期间崩溃而没有主动解锁，也能保证后续其他客户端能加锁。</p>
+</li>
+<li>
+<p>解铃还须系铃人。加锁和解锁必须是同一个客户端，客户端自己不能把别人加的锁给解了。</p>
+</li>
+<li>
+<p>加锁和解锁必须具有原子性。</p>
+</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">相关文章</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/yuan/p/juc/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">juc</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/juc_wzt/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">juc_wzt</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/%E7%BA%BF%E7%A8%8B%E6%B1%A0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">线程池</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/jvm/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JVM</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/yuan/p/javaweb%E5%92%8Cssm%E9%A2%98%E5%BA%93/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">JavaWEB和SSM题库</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    <div class="disqus-container">
+    <div id="disqus_thread"></div>
+<script>
+    window.disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "hugo-theme-stack" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</div>
+
+<style>
+    .disqus-container {
+        background-color: var(--card-background);
+        border-radius: var(--card-border-radius);
+        box-shadow: var(--shadow-l1);
+        padding: var(--card-padding);
+    }
+</style>
+
+<script>
+    window.addEventListener('onColorSchemeChange', (e) => {
+        if (typeof DISQUS == 'object') {
+            DISQUS.reset({
+                reload: true
+            });
+        }
+    })
+</script>
+
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2024 - 
+        
+        2025 米饭能吃饱
+    </section>
+    
+    <section class="powerby">
+        使用 <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> 构建 <br />
+        主题 <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> 由 <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> 设计
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/yuan/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
