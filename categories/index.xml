@@ -271,6 +271,30 @@
         <guid>https://z221224.github.io/yuan/categories/test-with-whitespaces/</guid>
         <description></description>
         </item>
+        <item>
+        <title>Git</title>
+        <link>https://z221224.github.io/yuan/categories/git/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/categories/git/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Linux</title>
+        <link>https://z221224.github.io/yuan/categories/linux/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/categories/linux/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>命令</title>
+        <link>https://z221224.github.io/yuan/categories/%E5%91%BD%E4%BB%A4/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://z221224.github.io/yuan/categories/%E5%91%BD%E4%BB%A4/</guid>
+        <description></description>
+        </item>
         
     </channel>
 </rss>
